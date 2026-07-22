@@ -94,7 +94,7 @@ const jsonLd = {
 
     <!-- Scroll-driven blur reveal for all text -->
     <script>
-      const candidates = document.querySelectorAll("main h1, main h2, main h3, main p, main .mono, main blockquote, main figcaption, main span.accent, main .display, footer h3, footer p");
+      const candidates = document.querySelectorAll("main h1, main h2, main h3, main p, main .mono, main blockquote, main figcaption, main span.accent, main .display");
       const blurEls = [];
       for (const el of candidates) {
         if (el.closest("#top")) continue;
