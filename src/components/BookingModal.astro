@@ -1,0 +1,501 @@
+---
+import { site } from "../data/site";
+
+const services = [
+  { id: "ai-agents", label: "AI Agents & Assistants" },
+  { id: "voice-ai", label: "Voice AI Platforms" },
+  { id: "rag", label: "RAG & Knowledge Systems" },
+  { id: "custom-software", label: "Custom Software / Web Apps" },
+  { id: "saas", label: "SaaS Platform Development" },
+  { id: "mobile", label: "Mobile App Development" },
+  { id: "automation", label: "Business Workflow Automation" },
+  { id: "crm", label: "CRM Build & Automation" },
+  { id: "integrations", label: "API & System Integration" },
+  { id: "backend", label: "Backend & Infrastructure" },
+];
+
+const stages = [
+  { id: "startup", label: "Startup / Founder", desc: "Need a first product, MVP, or CRM built properly and fast." },
+  { id: "growing", label: "Small & Growing Business", desc: "Need custom software or automation to run leaner and grow." },
+  { id: "enterprise", label: "Enterprise / Large Business", desc: "Need AI integration, workflow automation, or dedicated builds." },
+];
+
+const industries = [
+  "FinTech", "Healthcare", "E-commerce", "SaaS", "Real Estate",
+  "Logistics", "Marketing", "Recruitment & HR", "Legal", "Insurance",
+  "Education", "Professional Services", "Hospitality", "Manufacturing",
+  "Customer Support", "Other",
+];
+---
+
+<div id="booking-modal" class="bk-overlay" aria-hidden="true">
+  <div class="bk-backdrop"></div>
+  <div class="bk-container">
+    <div class="bk-panel">
+      <!-- close -->
+      <button class="bk-close" aria-label="Close" data-bk-close>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+
+      <!-- progress -->
+      <div class="bk-progress">
+        <div class="bk-progress-bar" data-bk-progress></div>
+      </div>
+
+      <!-- Step 1: Services -->
+      <div class="bk-step" data-bk-step="1">
+        <p class="mono text-[--color-acc-2]">Step 1 of 3</p>
+        <h2 class="display mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-white">What do you need?</h2>
+        <p class="mt-2 text-sm text-white/55">Select all that apply. We'll tailor the conversation to your needs.</p>
+
+        <div class="bk-grid mt-6">
+          {services.map((s) => (
+            <label class="bk-chip" data-bk-chip>
+              <input type="checkbox" name="services" value={s.id} class="sr-only" />
+              <span class="bk-chip-label">{s.label}</span>
+            </label>
+          ))}
+        </div>
+
+        <div class="bk-actions mt-8">
+          <button class="btn-primary px-6 py-3.5" data-bk-next disabled>Next <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Business Stage + Industry -->
+      <div class="bk-step" data-bk-step="2" style="display:none">
+        <p class="mono text-[--color-acc-2]">Step 2 of 3</p>
+        <h2 class="display mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-white">Tell us about your business</h2>
+        <p class="mt-2 text-sm text-white/55">This helps us match you with the right team and approach.</p>
+
+        <h3 class="mt-6 text-sm font-semibold text-white/70">What stage are you at?</h3>
+        <div class="bk-stages mt-3">
+          {stages.map((s) => (
+            <label class="bk-stage-card" data-bk-stage>
+              <input type="radio" name="stage" value={s.id} class="sr-only" />
+              <span class="bk-stage-title">{s.label}</span>
+              <span class="bk-stage-desc">{s.desc}</span>
+            </label>
+          ))}
+        </div>
+
+        <h3 class="mt-6 text-sm font-semibold text-white/70">Your industry</h3>
+        <div class="bk-grid mt-3">
+          {industries.map((ind) => (
+            <label class="bk-chip" data-bk-chip>
+              <input type="checkbox" name="industry" value={ind} class="sr-only" />
+              <span class="bk-chip-label">{ind}</span>
+            </label>
+          ))}
+        </div>
+
+        <div class="bk-actions mt-8">
+          <button class="btn-ghost px-5 py-3" data-bk-prev>&larr; Back</button>
+          <button class="btn-primary px-6 py-3.5" data-bk-next disabled>Next <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Contact Info -->
+      <div class="bk-step" data-bk-step="3" style="display:none">
+        <p class="mono text-[--color-acc-2]">Step 3 of 3</p>
+        <h2 class="display mt-3 text-[clamp(1.5rem,3vw,2.2rem)] text-white">How do we reach you?</h2>
+        <p class="mt-2 text-sm text-white/55">We'll get back to you within 24 hours to schedule a strategy call.</p>
+
+        <div class="bk-form mt-6">
+          <div class="bk-field">
+            <label class="bk-label" for="bk-name">Full name *</label>
+            <input id="bk-name" type="text" class="bk-input" placeholder="Jane Smith" required data-bk-required />
+          </div>
+          <div class="bk-field">
+            <label class="bk-label" for="bk-email">Work email *</label>
+            <input id="bk-email" type="email" class="bk-input" placeholder="jane@company.com" required data-bk-required />
+          </div>
+          <div class="bk-field">
+            <label class="bk-label" for="bk-company">Company name</label>
+            <input id="bk-company" type="text" class="bk-input" placeholder="Acme Inc." />
+          </div>
+          <div class="bk-field bk-field-full">
+            <label class="bk-label" for="bk-message">Tell us about your project</label>
+            <textarea id="bk-message" class="bk-input bk-textarea" placeholder="Describe your workflow, product idea, or the problem you're trying to solve..." rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="bk-actions mt-8">
+          <button class="btn-ghost px-5 py-3" data-bk-prev>&larr; Back</button>
+          <button class="btn-primary px-6 py-3.5" data-bk-submit>Book Strategy Call <span aria-hidden="true">&rarr;</span></button>
+        </div>
+      </div>
+
+      <!-- Step 4: Success -->
+      <div class="bk-step" data-bk-step="4" style="display:none">
+        <div class="bk-success">
+          <div class="bk-success-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h2 class="display mt-5 text-[clamp(1.5rem,3vw,2.2rem)] text-white">You're all set!</h2>
+          <p class="mt-3 max-w-md text-sm leading-6 text-white/60">
+            We've received your details. Our team will review your requirements and reach out within 24 hours to schedule your strategy call.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a href={site.bookingUrl} target="_blank" rel="noopener" class="btn-primary px-6 py-3.5">Book directly on Calendly <span aria-hidden="true">&rarr;</span></a>
+            <button class="btn-ghost px-5 py-3" data-bk-close>Close</button>
+          </div>
+          <p class="mt-4 text-xs text-white/35">Or email us at <a href={`mailto:${site.email}`} class="text-[--color-acc-2] hover:underline">{site.email}</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bk-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .bk-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .bk-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 4, 10, 0.85);
+    backdrop-filter: blur(12px);
+  }
+  .bk-container {
+    position: relative;
+    z-index: 1;
+    width: min(100% - 2rem, 680px);
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(103, 92, 255, 0.4) transparent;
+  }
+  .bk-panel {
+    position: relative;
+    border-radius: 24px;
+    border: 1px solid var(--color-line);
+    padding: 2.5rem 2rem;
+    background:
+      radial-gradient(120% 100% at 80% 10%, rgba(103, 92, 255, 0.08), transparent 50%),
+      radial-gradient(100% 100% at 20% 90%, rgba(30, 214, 255, 0.06), transparent 50%),
+      linear-gradient(155deg, rgba(12, 16, 36, 0.95), rgba(6, 8, 18, 0.95));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 32px 80px rgba(0, 0, 0, 0.6);
+  }
+  .bk-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--color-line);
+    color: var(--color-fg-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .bk-close:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .bk-progress {
+    height: 3px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.08);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .bk-progress-bar {
+    height: 100%;
+    width: 33.3%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--color-acc), var(--color-acc-2));
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .bk-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .bk-chip {
+    cursor: pointer;
+  }
+  .bk-chip-label {
+    display: inline-block;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-fg-muted);
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.25s ease;
+    user-select: none;
+  }
+  .bk-chip:hover .bk-chip-label {
+    border-color: rgba(103, 92, 255, 0.45);
+    color: white;
+  }
+  .bk-chip input:checked + .bk-chip-label {
+    border-color: var(--color-acc);
+    background: linear-gradient(135deg, rgba(103, 92, 255, 0.2), rgba(30, 214, 255, 0.1));
+    color: white;
+    box-shadow: 0 0 16px rgba(103, 92, 255, 0.2);
+  }
+
+  .bk-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .bk-stage-card {
+    cursor: pointer;
+    display: block;
+    padding: 1rem 1.2rem;
+    border-radius: 14px;
+    border: 1px solid var(--color-line);
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.25s ease;
+  }
+  .bk-stage-card:hover {
+    border-color: rgba(103, 92, 255, 0.4);
+  }
+  .bk-stage-card input:checked ~ .bk-stage-title {
+    color: white;
+  }
+  .bk-stage-card:has(input:checked) {
+    border-color: var(--color-acc);
+    background: linear-gradient(135deg, rgba(103, 92, 255, 0.14), rgba(30, 214, 255, 0.06));
+    box-shadow: 0 0 20px rgba(103, 92, 255, 0.15);
+  }
+  .bk-stage-title {
+    font-size: 0.92rem;
+    font-weight: 650;
+    color: var(--color-fg-muted);
+    transition: color 0.2s;
+  }
+  .bk-stage-desc {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.78rem;
+    color: var(--color-fg-dim);
+    line-height: 1.45;
+  }
+
+  .bk-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .bk-field-full { grid-column: 1 / -1; }
+  .bk-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-fg-muted);
+    margin-bottom: 0.4rem;
+  }
+  .bk-input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid var(--color-line);
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bk-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+  .bk-input:focus {
+    border-color: var(--color-acc);
+    box-shadow: 0 0 0 3px rgba(103, 92, 255, 0.15);
+  }
+  .bk-textarea { resize: vertical; min-height: 80px; }
+
+  .bk-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+  .bk-actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .bk-success {
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .bk-success-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(103, 92, 255, 0.25), rgba(30, 214, 255, 0.15));
+    border: 1px solid rgba(103, 92, 255, 0.35);
+    color: var(--color-acc-2);
+  }
+
+  @media (max-width: 640px) {
+    .bk-panel { padding: 2rem 1.25rem; }
+    .bk-form { grid-template-columns: 1fr; }
+    .bk-field-full { grid-column: 1; }
+    .bk-actions { flex-direction: column-reverse; width: 100%; }
+    .bk-actions button, .bk-actions a { width: 100%; text-align: center; }
+  }
+</style>
+
+<script>
+  const modal = document.getElementById("booking-modal");
+  if (modal) {
+    const steps = modal.querySelectorAll("[data-bk-step]");
+    const progressBar = modal.querySelector("[data-bk-progress]") as HTMLElement;
+    let current = 1;
+
+    const showStep = (n: number) => {
+      current = n;
+      steps.forEach((s) => {
+        (s as HTMLElement).style.display = s.getAttribute("data-bk-step") === String(n) ? "block" : "none";
+      });
+      if (progressBar) progressBar.style.width = `${(n / 3) * 100}%`;
+      if (n === 4 && progressBar) progressBar.style.width = "100%";
+      // scroll panel to top
+      const container = modal.querySelector(".bk-container");
+      if (container) container.scrollTop = 0;
+    };
+
+    const validateStep = (step: number) => {
+      const stepEl = modal.querySelector(`[data-bk-step="${step}"]`);
+      if (!stepEl) return false;
+      if (step === 1) {
+        return stepEl.querySelectorAll('input[name="services"]:checked').length > 0;
+      }
+      if (step === 2) {
+        return stepEl.querySelector('input[name="stage"]:checked') !== null;
+      }
+      if (step === 3) {
+        const name = (modal.querySelector("#bk-name") as HTMLInputElement)?.value.trim();
+        const email = (modal.querySelector("#bk-email") as HTMLInputElement)?.value.trim();
+        return name.length > 0 && email.length > 0 && email.includes("@");
+      }
+      return true;
+    };
+
+    const updateNextBtn = () => {
+      const stepEl = modal.querySelector(`[data-bk-step="${current}"]`);
+      if (!stepEl) return;
+      const nextBtn = stepEl.querySelector("[data-bk-next]") as HTMLButtonElement;
+      const submitBtn = stepEl.querySelector("[data-bk-submit]") as HTMLButtonElement;
+      if (nextBtn) nextBtn.disabled = !validateStep(current);
+      if (submitBtn) submitBtn.disabled = !validateStep(current);
+    };
+
+    // chip/radio selection listeners
+    modal.addEventListener("change", () => updateNextBtn());
+    modal.addEventListener("input", () => updateNextBtn());
+
+    // next buttons
+    modal.querySelectorAll("[data-bk-next]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (validateStep(current)) showStep(current + 1);
+        updateNextBtn();
+      });
+    });
+
+    // prev buttons
+    modal.querySelectorAll("[data-bk-prev]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showStep(current - 1);
+        updateNextBtn();
+      });
+    });
+
+    // submit
+    const submitBtn = modal.querySelector("[data-bk-submit]");
+    if (submitBtn) {
+      submitBtn.addEventListener("click", () => {
+        if (!validateStep(3)) return;
+
+        // Collect form data
+        const formData = {
+          services: Array.from(modal.querySelectorAll('input[name="services"]:checked')).map((i) => (i as HTMLInputElement).value),
+          stage: (modal.querySelector('input[name="stage"]:checked') as HTMLInputElement)?.value || "",
+          industries: Array.from(modal.querySelectorAll('input[name="industry"]:checked')).map((i) => (i as HTMLInputElement).value),
+          name: (modal.querySelector("#bk-name") as HTMLInputElement)?.value,
+          email: (modal.querySelector("#bk-email") as HTMLInputElement)?.value,
+          company: (modal.querySelector("#bk-company") as HTMLInputElement)?.value,
+          message: (modal.querySelector("#bk-message") as HTMLTextAreaElement)?.value,
+        };
+
+        // Build mailto with form data as a fallback
+        const subject = encodeURIComponent("Strategy Call Request - " + formData.name);
+        const body = encodeURIComponent(
+          `Name: ${formData.name}\nEmail: ${formData.email}\nCompany: ${formData.company || "N/A"}\n\nServices needed: ${formData.services.join(", ")}\nBusiness stage: ${formData.stage}\nIndustries: ${formData.industries.join(", ") || "N/A"}\n\nMessage:\n${formData.message || "N/A"}`
+        );
+        // Send email silently
+        const mailto = document.createElement("a");
+        mailto.href = `mailto:hello@insertai.com?subject=${subject}&body=${body}`;
+        mailto.click();
+
+        showStep(4);
+      });
+    }
+
+    // close buttons
+    modal.querySelectorAll("[data-bk-close]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      });
+    });
+
+    // backdrop close
+    modal.querySelector(".bk-backdrop")?.addEventListener("click", () => {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    });
+
+    // escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("is-open")) {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+    });
+
+    // Open modal from any trigger
+    document.querySelectorAll("[data-open-booking]").forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Reset to step 1
+        showStep(1);
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        updateNextBtn();
+      });
+    });
+  }
+</script>
