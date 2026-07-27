@@ -15,14 +15,14 @@ const colorFor = (slug) => (colorSet.has(slug) ? `/assets/logos-color/${slug}.sv
 // ratio (uniform scale). Cards are placed by %, and each wire is an orthogonal
 // path with rounded bends that docks at the centre of the card's facing border.
 const positions = [
-  { left: 55.6, top: 13.4 }, // 0 top
+  { left: 51.0, top: 13.4 }, // 0 top
   { left: 86.7, top: 36.1 }, // 1 right
   { left: 13.3, top: 36.1 }, // 2 left
   { left: 86.7, top: 80.8 }, // 3 bottom-right
   { left: 13.3, top: 80.8 }, // 4 bottom-left
 ];
 const wires = [
-  [[450, 255], [450, 180], [500, 180], [500, 130]], // top    (hub top -> card bottom)
+  [[450, 255], [450, 180], [459, 180], [459, 130]], // top    (hub top -> card bottom)
   [[554, 291], [630, 291], [630, 210], [700, 210]], // right  (hub right -> card left)
   [[346, 291], [270, 291], [270, 210], [200, 210]], // left   (hub left -> card right)
   [[475, 327], [475, 470], [700, 470]],             // bottom-right (hub bottom -> card left)

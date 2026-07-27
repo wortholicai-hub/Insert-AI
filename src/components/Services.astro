@@ -116,7 +116,7 @@ const capabilities = [
           height="1240"
           loading="lazy"
           decoding="async"
-          class="relative w-full rounded-[24px]"
+          class="relative w-[75%] mx-auto rounded-[24px]"
         />
       </div>
     </div>
@@ -345,33 +345,50 @@ const capabilities = [
     object-fit: cover;
     object-position: center;
     opacity: 0;
-    transform: scale(1.06);
+    transform: scale(1.08) translateX(30px);
+    filter: blur(6px) brightness(0.7);
     transition:
-      opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .spec-frame.is-visible {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateX(0);
+    filter: blur(0) brightness(1);
   }
 
-  /* Splash / ripple overlay on frame change */
+  .spec-frame.is-exiting {
+    opacity: 0;
+    transform: scale(0.95) translateX(-30px);
+    filter: blur(4px) brightness(0.6);
+  }
+
+  /* Shimmer sweep overlay on frame change */
   .spec-group::after {
     content: "";
     position: absolute;
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 50%, rgba(103, 92, 255, 0.3), rgba(30, 214, 255, 0.15) 40%, transparent 70%);
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(103, 92, 255, 0.18) 42%,
+      rgba(30, 214, 255, 0.22) 50%,
+      rgba(103, 92, 255, 0.18) 58%,
+      transparent 70%
+    );
     opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(-120%);
+    transition: none;
   }
 
   .spec-group.splash::after {
     opacity: 1;
-    transform: scale(1.2);
+    transform: translateX(120%);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease;
   }
 
   /* Progress dots */
@@ -431,7 +448,7 @@ const capabilities = [
 
   let currentGroup = 0;
   let cycleTimer: ReturnType<typeof setInterval> | null = null;
-  const CYCLE_MS = 1600; // time between image switches
+  const CYCLE_MS = 1000; // time between image switches
 
   function stopCycle() {
     if (cycleTimer) { clearInterval(cycleTimer); cycleTimer = null; }
@@ -447,20 +464,28 @@ const capabilities = [
     let activeFrame = 0;
 
     cycleTimer = setInterval(() => {
-      // hide current
-      frames[activeFrame].classList.remove('is-visible');
-      dots[activeFrame].classList.remove('is-current');
+      const prev = activeFrame;
+
+      // exit animation on current frame
+      frames[prev].classList.add('is-exiting');
+      frames[prev].classList.remove('is-visible');
+      dots[prev].classList.remove('is-current');
 
       // advance
       activeFrame = (activeFrame + 1) % frames.length;
 
-      // splash effect
+      // shimmer sweep
+      group.classList.remove('splash');
+      void (group as HTMLElement).offsetWidth; // force reflow
       group.classList.add('splash');
-      setTimeout(() => group.classList.remove('splash'), 350);
+      setTimeout(() => group.classList.remove('splash'), 650);
 
       // show next
       frames[activeFrame].classList.add('is-visible');
       dots[activeFrame].classList.add('is-current');
+
+      // clean up exit class
+      setTimeout(() => frames[prev].classList.remove('is-exiting'), 500);
     }, CYCLE_MS);
   }
 
