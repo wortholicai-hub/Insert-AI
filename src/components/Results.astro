@@ -42,9 +42,9 @@ const compare = [
 
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
         {miniOutcomes.map((o) => (
-          <div class="soft-card flex items-center gap-5 p-6">
-            <span class="display text-3xl text-[--color-acc-2]">{o.stat}</span>
-            <p class="text-sm leading-6 text-white/62">{o.text}</p>
+          <div class="flex items-center gap-5 rounded-2xl p-6" style="background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff); box-shadow: 0 12px 28px rgba(85, 94, 255, 0.35);">
+            <span class="display text-3xl text-white">{o.stat}</span>
+            <p class="text-sm leading-6 text-white/85">{o.text}</p>
           </div>
         ))}
       </div>
