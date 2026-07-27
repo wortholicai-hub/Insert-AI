@@ -1,33 +1,97 @@
 ---
 import { site } from "../data/site";
 
-// Spotlight image already includes its own labelled callouts (baked in).
 const spotlightImage = "/assets/generated/service-platform-spotlight.webp";
 
+// Each service has an array of images (4-6 per service).
+// Replace these placeholders with your final images later.
 const capabilities = [
   { title: "AI Voice Agents", desc: "Inbound & outbound calls, wired to your CRM.",
-    icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>` },
+    icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>`,
+    media: [
+      "/assets/Our services/ai voice agents/1.png",
+      "/assets/Our services/ai voice agents/2.png",
+      "/assets/Our services/ai voice agents/3.png",
+      "/assets/Our services/ai voice agents/4.png",
+      "/assets/Our services/ai voice agents/5.png",
+    ] },
   { title: "AI Chat Agents", desc: "Support & sales chat that qualifies and acts.",
-    icon: `<path d="M4 5h16v11H9l-4 3.5V16H4V5z"/><path d="M8.5 10h0M12 10h0M15.5 10h0"/>` },
+    icon: `<path d="M4 5h16v11H9l-4 3.5V16H4V5z"/><path d="M8.5 10h0M12 10h0M15.5 10h0"/>`,
+    media: [
+      "/assets/Our services/AI Chat Agents/1.png",
+      "/assets/Our services/AI Chat Agents/2.png",
+      "/assets/Our services/AI Chat Agents/3.png",
+      "/assets/Our services/AI Chat Agents/4.png",
+      "/assets/Our services/AI Chat Agents/5.png",
+      "/assets/Our services/AI Chat Agents/6.png",
+    ] },
   { title: "CRM Automations", desc: "Scoring, routing and follow-ups on autopilot.",
-    icon: `<path d="M4.5 12a7.5 7.5 0 0 1 12.5-5.6L20 9"/><path d="M20 4v5h-5"/><path d="M19.5 12a7.5 7.5 0 0 1-12.5 5.6L4 15"/><path d="M4 20v-5h5"/>` },
+    icon: `<path d="M4.5 12a7.5 7.5 0 0 1 12.5-5.6L20 9"/><path d="M20 4v5h-5"/><path d="M19.5 12a7.5 7.5 0 0 1-12.5 5.6L4 15"/><path d="M4 20v-5h5"/>`,
+    media: [
+      "/assets/Our services/CRM Automations/1.png",
+      "/assets/Our services/CRM Automations/2.png",
+      "/assets/Our services/CRM Automations/3.png",
+      "/assets/Our services/CRM Automations/4.png",
+      "/assets/Our services/CRM Automations/5.png",
+      "/assets/Our services/CRM Automations/6.png",
+    ] },
   { title: "Internal Dashboards", desc: "Live metrics and controls for your team.",
-    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>` },
+    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>`,
+    media: [
+      "/assets/Our services/Internal Dashboards/1.png",
+      "/assets/Our services/Internal Dashboards/2.png",
+      "/assets/Our services/Internal Dashboards/3.png",
+      "/assets/Our services/Internal Dashboards/4.png",
+      "/assets/Our services/Internal Dashboards/5.png",
+      "/assets/Our services/Internal Dashboards/6.png",
+    ] },
   { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
-    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>` },
+    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
+    media: [
+      "/assets/Our services/Custom Web Apps/1.png",
+      "/assets/Our services/Custom Web Apps/2.png",
+      "/assets/Our services/Custom Web Apps/3.png",
+      "/assets/Our services/Custom Web Apps/4.png",
+      "/assets/Our services/Custom Web Apps/5.png",
+      "/assets/Our services/Custom Web Apps/6.png",
+      "/assets/Our services/Custom Web Apps/7.png",
+      "/assets/Our services/Custom Web Apps/8.png",
+      "/assets/Our services/Custom Web Apps/9.png",
+      "/assets/Our services/Custom Web Apps/10.png",
+    ] },
   { title: "SaaS Platforms", desc: "Multi-tenant products, built to scale.",
-    icon: `<path d="M12 3 3 7.5l9 4.5 9-4.5L12 3z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/>` },
+    icon: `<path d="M12 3 3 7.5l9 4.5 9-4.5L12 3z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/>`,
+    media: [
+      "/assets/Our services/SaaS Platforms/1.png",
+      "/assets/Our services/SaaS Platforms/2.png",
+      "/assets/Our services/SaaS Platforms/3.png",
+      "/assets/Our services/SaaS Platforms/4.png",
+      "/assets/Our services/SaaS Platforms/5.png",
+      "/assets/Our services/SaaS Platforms/6.png",
+    ] },
   { title: "RAG Knowledge Systems", desc: "Sourced answers over your documents.",
-    icon: `<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v14H6.5A1.5 1.5 0 0 0 5 18.5V4.5z"/><path d="M5 18.5A1.5 1.5 0 0 1 6.5 17H19v4H6.5A1.5 1.5 0 0 1 5 19.5"/><path d="M9 8h6M9 11h4"/>` },
+    icon: `<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v14H6.5A1.5 1.5 0 0 0 5 18.5V4.5z"/><path d="M5 18.5A1.5 1.5 0 0 1 6.5 17H19v4H6.5A1.5 1.5 0 0 1 5 19.5"/><path d="M9 8h6M9 11h4"/>`,
+    media: [
+      "/assets/generated/service-v3-platform-more.webp",
+      "/assets/generated/service-v2-platform-more.webp",
+      "/assets/generated/service-platform-more.webp",
+      "/assets/generated/service-platform-spotlight.webp",
+    ] },
   { title: "Workflow Integrations", desc: "Connect 200+ tools into one flow.",
-    icon: `<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2V11a3 3 0 0 0 3 3h1.2M18 8.2V11a3 3 0 0 1-3 3h-1.2"/>` },
+    icon: `<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2V11a3 3 0 0 0 3 3h1.2M18 8.2V11a3 3 0 0 1-3 3h-1.2"/>`,
+    media: [
+      "/assets/generated/service-v3-mobile-app.webp",
+      "/assets/generated/service-v2-mobile-app.webp",
+      "/assets/generated/service-mobile-app.webp",
+      "/assets/generated/service-strategy.webp",
+    ] },
 ];
 ---
 
+<!-- ============ "What we build" intro ============ -->
 <section id="services" class="py-5">
   <div class="site-shell">
     <div class="grid items-center gap-5 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
-      <!-- statement (left) -->
       <div class="reveal flex flex-col justify-center px-1 py-6 lg:px-5">
         <p class="mono text-[--color-acc]">What we build</p>
         <h2 class="display mt-4 text-[clamp(2rem,4vw,3.35rem)]">
@@ -38,17 +102,10 @@ const capabilities = [
           platforms - we design and engineer the complex technology growing businesses rely on.
           If you can describe it, we can build it.
         </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href={site.bookingUrl} class="btn-primary px-6 py-3.5">Start building <span aria-hidden="true">→</span></a>
-          <a href="#work" class="btn-ghost px-6 py-3.5">Explore all 15 services</a>
-        </div>
       </div>
 
-      <!-- labelled capability image (right) -->
       <div class="reveal relative">
-        <!-- ambient glow bleeding behind the image -->
         <div class="pointer-events-none absolute -inset-6 -z-10 bg-[radial-gradient(circle_at_38%_40%,rgba(46,214,255,.22),transparent_62%),radial-gradient(circle_at_64%_74%,rgba(103,92,255,.2),transparent_60%)] blur-2xl"></div>
-
         <img
           src={spotlightImage}
           alt="AI engineering capabilities - AI Agents, AI Voice Agents, Business Automation, Custom Software, SaaS Platforms and AI solutions that scale"
@@ -60,134 +117,385 @@ const capabilities = [
         />
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {capabilities.map((c, i) => (
-        <article class="cap-card">
-          <span class="cap-index">{String(i + 1).padStart(2, "0")}</span>
-          <span class="cap-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={c.icon}></svg>
-          </span>
-          <h3 class="cap-title">
-            {c.title}
-            <svg class="cap-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </h3>
-          <p class="cap-desc">{c.desc}</p>
-        </article>
-      ))}
+<!-- ============ "We Specialize In" interactive section ============ -->
+<section class="spec-section">
+  <div class="site-shell">
+    <p class="mono text-[--color-acc]">Our services</p>
+    <h2 class="spec-title display">We Specialize In</h2>
+
+    <div class="spec-body">
+      <!-- Service list -->
+      <ul class="spec-services" id="specServices">
+        {capabilities.map((c, i) => (
+          <li>
+            <button
+              class:list={["spec-item", { "is-active": i === 0 }]}
+              data-index={i}
+              type="button"
+            >
+              <span class="spec-num">{String(i + 1).padStart(2, "0")}</span>
+              <span class="spec-text">
+                <span class="spec-name">{c.title}</span>
+                <span class="spec-desc">{c.desc}</span>
+              </span>
+              <svg class="spec-arrow" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor">
+                <path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z" />
+              </svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Media panel — each service group has multiple stacked images -->
+      <div class="spec-media" id="specMedia">
+        {capabilities.map((c, gi) => (
+          <div
+            class:list={["spec-group", { "is-active": gi === 0 }]}
+            data-group={gi}
+          >
+            {c.media.map((src, si) => (
+              <img
+                src={src}
+                alt={`${c.title} ${si + 1}`}
+                draggable="false"
+                loading={gi === 0 && si === 0 ? "eager" : "lazy"}
+                class:list={["spec-frame", { "is-visible": si === 0 }]}
+                data-frame={si}
+              />
+            ))}
+            <!-- progress dots -->
+            <div class="spec-dots">
+              {c.media.map((_, si) => (
+                <span class:list={["spec-dot", { "is-current": si === 0 }]} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href={site.bookingUrl} class="btn-primary px-6 py-3.5">
+        Book a Free Consultation
+        <span aria-hidden="true">→</span>
+      </a>
+      <a href="#work" class="btn-ghost px-6 py-3.5">Case Studies</a>
     </div>
   </div>
 </section>
 
 <style>
-  .cap-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    border-radius: 18px;
-    padding: 1.55rem 1.5rem 1.6rem;
-    border: 1px solid var(--color-line);
-    background:
-      radial-gradient(120% 90% at 100% 0%, rgba(46, 214, 255, 0.06), transparent 55%),
-      linear-gradient(158deg, rgba(19, 25, 50, 0.66), rgba(6, 9, 20, 0.72));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  /* ---- We Specialize In section ---- */
+  .spec-section {
+    padding: 3rem 0;
   }
 
-  /* glow blob that blooms on hover */
-  .cap-card::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: -55%;
-    right: -35%;
-    width: 80%;
-    height: 130%;
-    background: radial-gradient(circle, rgba(46, 214, 255, 0.22), rgba(103, 92, 255, 0.12) 45%, transparent 68%);
-    opacity: 0;
-    transition: opacity 0.45s ease;
+  .spec-title {
+    margin-top: 0.75rem;
+    margin-bottom: 2rem;
+    font-size: clamp(2rem, 4vw, 3.2rem);
   }
 
-  /* animated top hairline */
-  .cap-card::after {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-acc-2), var(--color-acc-3), transparent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .cap-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(46, 214, 255, 0.42);
-    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(46, 214, 255, 0.12);
-  }
-  .cap-card:hover::before { opacity: 1; }
-  .cap-card:hover::after { transform: scaleX(1); }
-
-  .cap-index {
-    position: absolute;
-    top: 1.2rem;
-    right: 1.25rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: var(--color-fg-dim);
-    transition: color 0.4s ease;
-  }
-  .cap-card:hover .cap-index { color: var(--color-acc-2); }
-
-  .cap-icon {
+  .spec-body {
     display: grid;
-    place-items: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 13px;
-    color: var(--color-acc-2);
-    background: linear-gradient(135deg, rgba(103, 92, 255, 0.28), rgba(30, 214, 255, 0.16));
-    border: 1px solid rgba(46, 214, 255, 0.24);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
-  }
-  .cap-card:hover .cap-icon {
-    transform: scale(1.08) rotate(-3deg);
-    box-shadow: 0 0 24px rgba(46, 214, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    grid-template-columns: 0.92fr 1.08fr;
+    gap: 3rem;
+    align-items: start;
   }
 
-  .cap-title {
+  .spec-services {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    margin-top: 1.15rem;
-    font-size: 15.5px;
-    font-weight: 650;
-    color: var(--color-fg);
+    flex-direction: column;
+    gap: 4px;
   }
 
-  .cap-arrow {
-    color: var(--color-acc-2);
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .cap-card:hover .cap-arrow { opacity: 1; transform: translateX(0); }
-
-  .cap-desc {
-    margin-top: 0.5rem;
-    font-size: 13.5px;
-    line-height: 1.55;
+  .spec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
     color: var(--color-fg-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    opacity: 0.45;
+    transition:
+      background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .spec-item.is-active {
+    background: linear-gradient(135deg, rgba(103, 92, 255, 0.35), rgba(30, 214, 255, 0.12));
+    border-color: rgba(103, 92, 255, 0.4);
+    color: var(--color-fg);
+    opacity: 1;
+  }
+
+  .spec-item:hover:not(.is-active) {
+    opacity: 0.7;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .spec-item:focus-visible {
+    outline: 2px solid var(--color-acc);
+    outline-offset: 2px;
+  }
+
+  .spec-num {
+    flex: 0 0 auto;
+    padding-top: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.6;
+  }
+
+  .spec-item.is-active .spec-num {
+    color: var(--color-acc-2);
+    opacity: 1;
+  }
+
+  .spec-text { flex: 1 1 auto; min-width: 0; }
+
+  .spec-name {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .spec-desc {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.72;
+  }
+
+  .spec-arrow {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    transform: translateX(-6px);
+    opacity: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .spec-item.is-active .spec-arrow {
+    transform: translateX(0);
+    opacity: 1;
+    color: #fff;
+  }
+
+  /* ---- Media panel ---- */
+  .spec-media {
+    position: sticky;
+    top: 6rem;
+    isolation: isolate;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    background: linear-gradient(145deg, rgba(19, 25, 50, 0.72), rgba(5, 7, 16, 0.72));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 24px 70px rgba(0, 0, 0, 0.38);
+    aspect-ratio: 9 / 7.7;
+  }
+
+  /* Each service's image group */
+  .spec-group {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .spec-group.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Individual frames within a group */
+  .spec-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    transform: scale(1.06);
+    transition:
+      opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .spec-frame.is-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Splash / ripple overlay on frame change */
+  .spec-group::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(103, 92, 255, 0.3), rgba(30, 214, 255, 0.15) 40%, transparent 70%);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .spec-group.splash::after {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  /* Progress dots */
+  .spec-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 6px;
+  }
+
+  .spec-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+
+  .spec-dot.is-current {
+    background: #fff;
+    transform: scale(1.3);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 900px) {
+    .spec-body {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .spec-media {
+      position: static;
+      order: -1;
+    }
+    .spec-item { padding: 0.85rem 1rem; }
+    .spec-name { font-size: 1rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cap-card,
-    .cap-card::after,
-    .cap-icon,
-    .cap-arrow { transition: none; }
-    .cap-card:hover { transform: none; }
+    .spec-item, .spec-arrow, .spec-frame, .spec-group {
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
+
+<script>
+(function () {
+  const list  = document.getElementById('specServices');
+  const media = document.getElementById('specMedia');
+  if (!list || !media) return;
+
+  const items  = list.querySelectorAll('.spec-item');
+  const groups = media.querySelectorAll('.spec-group');
+  const count  = groups.length;
+
+  let currentGroup = 0;
+  let cycleTimer: ReturnType<typeof setInterval> | null = null;
+  const CYCLE_MS = 1600; // time between image switches
+
+  function stopCycle() {
+    if (cycleTimer) { clearInterval(cycleTimer); cycleTimer = null; }
+  }
+
+  function startCycle(groupIndex: number) {
+    stopCycle();
+    const group = groups[groupIndex];
+    const frames = group.querySelectorAll('.spec-frame');
+    const dots   = group.querySelectorAll('.spec-dot');
+    if (frames.length <= 1) return;
+
+    let activeFrame = 0;
+
+    cycleTimer = setInterval(() => {
+      // hide current
+      frames[activeFrame].classList.remove('is-visible');
+      dots[activeFrame].classList.remove('is-current');
+
+      // advance
+      activeFrame = (activeFrame + 1) % frames.length;
+
+      // splash effect
+      group.classList.add('splash');
+      setTimeout(() => group.classList.remove('splash'), 350);
+
+      // show next
+      frames[activeFrame].classList.add('is-visible');
+      dots[activeFrame].classList.add('is-current');
+    }, CYCLE_MS);
+  }
+
+  function activate(index: number) {
+    if (index === currentGroup || index < 0 || index >= count) return;
+
+    // reset previous group's frames to first image
+    const prevGroup = groups[currentGroup];
+    const prevFrames = prevGroup.querySelectorAll('.spec-frame');
+    const prevDots   = prevGroup.querySelectorAll('.spec-dot');
+    prevFrames.forEach((f, i) => f.classList.toggle('is-visible', i === 0));
+    prevDots.forEach((d, i) => d.classList.toggle('is-current', i === 0));
+
+    currentGroup = index;
+
+    // toggle service list active state
+    items.forEach((el, i) => el.classList.toggle('is-active', i === index));
+
+    // toggle media group
+    groups.forEach((g, i) => g.classList.toggle('is-active', i === index));
+
+    // restart the image cycle for the new group
+    startCycle(index);
+  }
+
+  items.forEach((el) => {
+    const index = parseInt((el as HTMLElement).dataset.index || '0', 10);
+    el.addEventListener('mouseenter', () => activate(index));
+    el.addEventListener('focus', () => activate(index));
+    el.addEventListener('click', (e) => {
+      if (window.matchMedia('(hover: none)').matches && currentGroup !== index) {
+        e.preventDefault();
+        activate(index);
+      }
+    });
+  });
+
+  // start cycling on the first group
+  startCycle(0);
+})();
+</script>
