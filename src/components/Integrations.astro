@@ -51,17 +51,17 @@ const systems = [
           <div class="relative h-44 overflow-hidden">
             <img src={s.img} alt="" loading="lazy" decoding="async" class="h-full w-full object-cover opacity-88 transition duration-500 group-hover:scale-105" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent"></div>
-            <div class="absolute left-5 top-4 text-xs font-bold uppercase tracking-[0.16em] text-[--color-acc-2]">{s.tag}</div>
+            <div class="absolute left-5 top-4 text-xs font-bold uppercase tracking-[0.16em] text-white">{s.tag}</div>
           </div>
 
           <div class="flex flex-1 flex-col gap-4 p-6">
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
-                <p class="mono text-[10px] text-[--color-fg-dim]">Problem</p>
+                <p class="mono text-[10px] text-white">Problem</p>
                 <p class="mt-1.5 text-sm leading-6 text-white/62">{s.problem}</p>
               </div>
               <div>
-                <p class="mono text-[10px] text-[--color-fg-dim]">System built</p>
+                <p class="mono text-[10px] text-white">System built</p>
                 <p class="mt-1.5 text-sm leading-6 text-white/62">{s.system}</p>
               </div>
             </div>

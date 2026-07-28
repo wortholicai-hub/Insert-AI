@@ -6,6 +6,27 @@ const spotlightImage = "/assets/generated/service-platform-spotlight.webp";
 // Each service has an array of images (4-6 per service).
 // Replace these placeholders with your final images later.
 const capabilities = [
+  { title: "Internal Dashboards", desc: "Live metrics and controls for your team.",
+    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>`,
+    media: [
+      "/assets/Our services/Internal Dashboards/1.png",
+      "/assets/Our services/Internal Dashboards/2.png",
+      "/assets/Our services/Internal Dashboards/3.png",
+      "/assets/Our services/Internal Dashboards/4.png",
+      "/assets/Our services/Internal Dashboards/5.png",
+      "/assets/Our services/Internal Dashboards/6.png",
+      "/assets/Our services/Internal Dashboards/7.png",
+    ] },
+  { title: "SaaS Platforms", desc: "Multi-tenant products, built to scale.",
+    icon: `<path d="M12 3 3 7.5l9 4.5 9-4.5L12 3z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/>`,
+    media: [
+      "/assets/Our services/SaaS Platforms/1.png",
+      "/assets/Our services/SaaS Platforms/2.png",
+      "/assets/Our services/SaaS Platforms/3.png",
+      "/assets/Our services/SaaS Platforms/4.png",
+      "/assets/Our services/SaaS Platforms/5.png",
+      "/assets/Our services/SaaS Platforms/6.png",
+    ] },
   { title: "AI Voice Agents", desc: "Inbound & outbound calls, wired to your CRM.",
     icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>`,
     media: [
@@ -14,6 +35,7 @@ const capabilities = [
       "/assets/Our services/ai voice agents/3.png",
       "/assets/Our services/ai voice agents/4.png",
       "/assets/Our services/ai voice agents/5.png",
+      "/assets/Our services/ai voice agents/6.png",
     ] },
   { title: "AI Chat Agents", desc: "Support & sales chat that qualifies and acts.",
     icon: `<path d="M4 5h16v11H9l-4 3.5V16H4V5z"/><path d="M8.5 10h0M12 10h0M15.5 10h0"/>`,
@@ -35,16 +57,6 @@ const capabilities = [
       "/assets/Our services/CRM Automations/5.png",
       "/assets/Our services/CRM Automations/6.png",
     ] },
-  { title: "Internal Dashboards", desc: "Live metrics and controls for your team.",
-    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>`,
-    media: [
-      "/assets/Our services/Internal Dashboards/1.png",
-      "/assets/Our services/Internal Dashboards/2.png",
-      "/assets/Our services/Internal Dashboards/3.png",
-      "/assets/Our services/Internal Dashboards/4.png",
-      "/assets/Our services/Internal Dashboards/5.png",
-      "/assets/Our services/Internal Dashboards/6.png",
-    ] },
   { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
     icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
     media: [
@@ -58,16 +70,6 @@ const capabilities = [
       "/assets/Our services/Custom Web Apps/8.png",
       "/assets/Our services/Custom Web Apps/9.png",
       "/assets/Our services/Custom Web Apps/10.png",
-    ] },
-  { title: "SaaS Platforms", desc: "Multi-tenant products, built to scale.",
-    icon: `<path d="M12 3 3 7.5l9 4.5 9-4.5L12 3z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/>`,
-    media: [
-      "/assets/Our services/SaaS Platforms/1.png",
-      "/assets/Our services/SaaS Platforms/2.png",
-      "/assets/Our services/SaaS Platforms/3.png",
-      "/assets/Our services/SaaS Platforms/4.png",
-      "/assets/Our services/SaaS Platforms/5.png",
-      "/assets/Our services/SaaS Platforms/6.png",
     ] },
   { title: "RAG Knowledge Systems", desc: "Sourced answers over your documents.",
     icon: `<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v14H6.5A1.5 1.5 0 0 0 5 18.5V4.5z"/><path d="M5 18.5A1.5 1.5 0 0 1 6.5 17H19v4H6.5A1.5 1.5 0 0 1 5 19.5"/><path d="M9 8h6M9 11h4"/>`,
@@ -86,7 +88,6 @@ const capabilities = [
       "/assets/Our services/WORKFLOW/3.png",
       "/assets/Our services/WORKFLOW/4.png",
       "/assets/Our services/WORKFLOW/5.png",
-      "/assets/Our services/WORKFLOW/6.png",
     ] },
 ];
 ---
@@ -130,27 +131,37 @@ const capabilities = [
     <h2 class="spec-title display">We Specialize In</h2>
 
     <div class="spec-body">
-      <!-- Service list -->
-      <ul class="spec-services" id="specServices">
-        {capabilities.map((c, i) => (
-          <li>
-            <button
-              class:list={["spec-item", { "is-active": i === 0 }]}
-              data-index={i}
-              type="button"
-            >
-              <span class="spec-num">{String(i + 1).padStart(2, "0")}</span>
-              <span class="spec-text">
-                <span class="spec-name">{c.title}</span>
-                <span class="spec-desc">{c.desc}</span>
-              </span>
-              <svg class="spec-arrow" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor">
-                <path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z" />
-              </svg>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <!-- Service list + CTAs column -->
+      <div>
+        <ul class="spec-services" id="specServices">
+          {capabilities.map((c, i) => (
+            <li>
+              <button
+                class:list={["spec-item", { "is-active": i === 0 }]}
+                data-index={i}
+                type="button"
+              >
+                <span class="spec-num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="spec-text">
+                  <span class="spec-name">{c.title}</span>
+                  <span class="spec-desc">{c.desc}</span>
+                </span>
+                <svg class="spec-arrow" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor">
+                  <path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z" />
+                </svg>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div class="mt-4 flex flex-wrap gap-3">
+          <a href={site.bookingUrl} class="btn-primary px-6 py-3.5">
+            Book a Free Consultation
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="#work" class="btn-ghost px-6 py-3.5">Case Studies</a>
+        </div>
+      </div>
 
       <!-- Media panel — each service group has multiple stacked images -->
       <div class="spec-media" id="specMedia">
@@ -165,8 +176,11 @@ const capabilities = [
                 alt={`${c.title} ${si + 1}`}
                 draggable="false"
                 loading={gi === 0 && si === 0 ? "eager" : "lazy"}
+                decoding="async"
+                fetchpriority={gi === 0 && si === 0 ? "high" : "auto"}
                 class:list={["spec-frame", { "is-visible": si === 0 }]}
                 data-frame={si}
+                style="image-rendering: -webkit-optimize-contrast;"
               />
             ))}
             <!-- progress dots -->
@@ -180,14 +194,6 @@ const capabilities = [
       </div>
     </div>
 
-    <!-- CTAs -->
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a href={site.bookingUrl} class="btn-primary px-6 py-3.5">
-        Book a Free Consultation
-        <span aria-hidden="true">→</span>
-      </a>
-      <a href="#work" class="btn-ghost px-6 py-3.5">Case Studies</a>
-    </div>
   </div>
 </section>
 
@@ -216,15 +222,15 @@ const capabilities = [
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
 
   .spec-item {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.7rem;
     width: 100%;
-    padding: 0.75rem 1.1rem;
+    padding: 0.4rem 0.9rem;
     border: 1px solid transparent;
     border-radius: 10px;
     background: transparent;
@@ -259,8 +265,8 @@ const capabilities = [
 
   .spec-num {
     flex: 0 0 auto;
-    padding-top: 4px;
-    font-size: 13px;
+    padding-top: 2px;
+    font-size: 11px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     opacity: 0.6;
@@ -275,17 +281,17 @@ const capabilities = [
 
   .spec-name {
     display: block;
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.2;
     letter-spacing: -0.01em;
   }
 
   .spec-desc {
     display: block;
-    margin-top: 4px;
-    font-size: 0.85rem;
-    line-height: 1.5;
+    margin-top: 2px;
+    font-size: 0.75rem;
+    line-height: 1.4;
     opacity: 0.72;
   }
 
@@ -319,7 +325,7 @@ const capabilities = [
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
       0 24px 70px rgba(0, 0, 0, 0.38);
-    aspect-ratio: 9 / 7.7;
+    aspect-ratio: 9 / 6;
   }
 
   /* Each service's image group */
@@ -522,6 +528,10 @@ const capabilities = [
       }
     });
   });
+
+  // pause cycling when hovering over the media panel
+  media.addEventListener('mouseenter', () => stopCycle());
+  media.addEventListener('mouseleave', () => startCycle(currentGroup));
 
   // start cycling on the first group
   startCycle(0);
