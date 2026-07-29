@@ -27,6 +27,23 @@ const capabilities = [
       "/assets/Our services/SaaS Platforms/5.png",
       "/assets/Our services/SaaS Platforms/6.png",
     ] },
+  { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
+    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
+    media: [
+      "/assets/Our services/Custom Web Apps/1.png",
+      "/assets/Our services/Custom Web Apps/2.png",
+      "/assets/Our services/Custom Web Apps/3.png",
+      "/assets/Our services/Custom Web Apps/4.png",
+      "/assets/Our services/Custom Web Apps/5.png",
+      "/assets/Our services/Custom Web Apps/6.png",
+      "/assets/Our services/Custom Web Apps/7.png",
+      "/assets/Our services/Custom Web Apps/8.png",
+      "/assets/Our services/Custom Web Apps/9.png",
+      "/assets/Our services/Custom Web Apps/10.png",
+      "/assets/Our services/Custom Web Apps/11.png",
+      "/assets/Our services/Custom Web Apps/12.png",
+      "/assets/Our services/Custom Web Apps/13.png",
+    ] },
   { title: "AI Voice Agents", desc: "Inbound & outbound calls, wired to your CRM.",
     icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>`,
     media: [
@@ -57,20 +74,6 @@ const capabilities = [
       "/assets/Our services/CRM Automations/5.png",
       "/assets/Our services/CRM Automations/6.png",
     ] },
-  { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
-    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
-    media: [
-      "/assets/Our services/Custom Web Apps/1.png",
-      "/assets/Our services/Custom Web Apps/2.png",
-      "/assets/Our services/Custom Web Apps/3.png",
-      "/assets/Our services/Custom Web Apps/4.png",
-      "/assets/Our services/Custom Web Apps/5.png",
-      "/assets/Our services/Custom Web Apps/6.png",
-      "/assets/Our services/Custom Web Apps/7.png",
-      "/assets/Our services/Custom Web Apps/8.png",
-      "/assets/Our services/Custom Web Apps/9.png",
-      "/assets/Our services/Custom Web Apps/10.png",
-    ] },
   { title: "RAG Knowledge Systems", desc: "Sourced answers over your documents.",
     icon: `<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v14H6.5A1.5 1.5 0 0 0 5 18.5V4.5z"/><path d="M5 18.5A1.5 1.5 0 0 1 6.5 17H19v4H6.5A1.5 1.5 0 0 1 5 19.5"/><path d="M9 8h6M9 11h4"/>`,
     media: [
@@ -88,6 +91,7 @@ const capabilities = [
       "/assets/Our services/WORKFLOW/3.png",
       "/assets/Our services/WORKFLOW/4.png",
       "/assets/Our services/WORKFLOW/5.png",
+      "/assets/Our services/WORKFLOW/6.png",
     ] },
 ];
 ---
@@ -191,6 +195,13 @@ const capabilities = [
             </div>
           </div>
         ))}
+        <!-- Navigation arrows -->
+        <button class="spec-nav spec-nav--prev" type="button" aria-label="Previous image">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="spec-nav spec-nav--next" type="button" aria-label="Next image">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
       </div>
     </div>
 
@@ -318,13 +329,10 @@ const capabilities = [
     position: sticky;
     top: 6rem;
     isolation: isolate;
-    border-radius: 18px;
+    border-radius: 0;
     overflow: hidden;
-    border: 1px solid var(--color-line);
-    background: linear-gradient(145deg, rgba(19, 25, 50, 0.72), rgba(5, 7, 16, 0.72));
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 24px 70px rgba(0, 0, 0, 0.38);
+    border: none;
+    background: transparent;
     aspect-ratio: 9 / 6;
   }
 
@@ -397,6 +405,40 @@ const capabilities = [
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease;
   }
 
+  /* Navigation arrows */
+  .spec-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.2s ease, transform 0.25s ease;
+  }
+  .spec-nav svg {
+    width: 18px;
+    height: 18px;
+  }
+  .spec-media:hover .spec-nav {
+    opacity: 1;
+  }
+  .spec-nav:hover {
+    background: linear-gradient(135deg, #725eff, #4e73ff);
+    border-color: transparent;
+    transform: translateY(-50%) scale(1.1);
+  }
+  .spec-nav--prev { left: 12px; }
+  .spec-nav--next { right: 12px; }
+
   /* Progress dots */
   .spec-dots {
     position: absolute;
@@ -450,48 +492,58 @@ const capabilities = [
 
   const items  = list.querySelectorAll('.spec-item');
   const groups = media.querySelectorAll('.spec-group');
+  const prevBtn = media.querySelector('.spec-nav--prev');
+  const nextBtn = media.querySelector('.spec-nav--next');
   const count  = groups.length;
 
   let currentGroup = 0;
+  let activeFrames: number[] = new Array(count).fill(0);
   let cycleTimer: ReturnType<typeof setInterval> | null = null;
-  const CYCLE_MS = 1000; // time between image switches
+  const CYCLE_MS = 1000;
 
   function stopCycle() {
     if (cycleTimer) { clearInterval(cycleTimer); cycleTimer = null; }
+  }
+
+  function switchFrame(groupIndex: number, direction: number) {
+    const group = groups[groupIndex];
+    const frames = group.querySelectorAll('.spec-frame');
+    const dots   = group.querySelectorAll('.spec-dot');
+    if (frames.length <= 1) return;
+
+    const prev = activeFrames[groupIndex];
+
+    // exit animation
+    frames[prev].classList.add('is-exiting');
+    frames[prev].classList.remove('is-visible');
+    dots[prev].classList.remove('is-current');
+
+    // advance or go back
+    activeFrames[groupIndex] = (prev + direction + frames.length) % frames.length;
+    const next = activeFrames[groupIndex];
+
+    // shimmer sweep
+    group.classList.remove('splash');
+    void (group as HTMLElement).offsetWidth;
+    group.classList.add('splash');
+    setTimeout(() => group.classList.remove('splash'), 650);
+
+    // show next
+    frames[next].classList.add('is-visible');
+    dots[next].classList.add('is-current');
+
+    // clean up exit class
+    setTimeout(() => frames[prev].classList.remove('is-exiting'), 500);
   }
 
   function startCycle(groupIndex: number) {
     stopCycle();
     const group = groups[groupIndex];
     const frames = group.querySelectorAll('.spec-frame');
-    const dots   = group.querySelectorAll('.spec-dot');
     if (frames.length <= 1) return;
 
-    let activeFrame = 0;
-
     cycleTimer = setInterval(() => {
-      const prev = activeFrame;
-
-      // exit animation on current frame
-      frames[prev].classList.add('is-exiting');
-      frames[prev].classList.remove('is-visible');
-      dots[prev].classList.remove('is-current');
-
-      // advance
-      activeFrame = (activeFrame + 1) % frames.length;
-
-      // shimmer sweep
-      group.classList.remove('splash');
-      void (group as HTMLElement).offsetWidth; // force reflow
-      group.classList.add('splash');
-      setTimeout(() => group.classList.remove('splash'), 650);
-
-      // show next
-      frames[activeFrame].classList.add('is-visible');
-      dots[activeFrame].classList.add('is-current');
-
-      // clean up exit class
-      setTimeout(() => frames[prev].classList.remove('is-exiting'), 500);
+      switchFrame(groupIndex, 1);
     }, CYCLE_MS);
   }
 
@@ -504,6 +556,7 @@ const capabilities = [
     const prevDots   = prevGroup.querySelectorAll('.spec-dot');
     prevFrames.forEach((f, i) => f.classList.toggle('is-visible', i === 0));
     prevDots.forEach((d, i) => d.classList.toggle('is-current', i === 0));
+    activeFrames[currentGroup] = 0;
 
     currentGroup = index;
 
@@ -516,6 +569,16 @@ const capabilities = [
     // restart the image cycle for the new group
     startCycle(index);
   }
+
+  // Left/right nav buttons
+  prevBtn?.addEventListener('click', () => {
+    stopCycle();
+    switchFrame(currentGroup, -1);
+  });
+  nextBtn?.addEventListener('click', () => {
+    stopCycle();
+    switchFrame(currentGroup, 1);
+  });
 
   items.forEach((el) => {
     const index = parseInt((el as HTMLElement).dataset.index || '0', 10);
