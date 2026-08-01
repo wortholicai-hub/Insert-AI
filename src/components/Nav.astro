@@ -2,11 +2,10 @@
 import { site } from "../data/site";
 
 const links = [
-  { href: "#work", label: "Work" },
+  { href: "#case-studies", label: "Work" },
   { href: "#services", label: "Services" },
   { href: "#process", label: "Process" },
   { href: "#about", label: "About" },
-  { href: "#insights", label: "Insights" },
 ];
 ---
 
@@ -22,6 +21,7 @@ const links = [
           {l.label}
         </a>
       ))}
+      <button type="button" data-legal="guides" class="text-sm text-white/78 transition hover:text-white cursor-pointer">Guides</button>
     </nav>
 
     <div class="flex items-center gap-3">

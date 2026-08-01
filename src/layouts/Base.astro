@@ -94,15 +94,21 @@ const jsonLd = {
 
     <!-- Scroll-driven blur reveal for all text -->
     <script>
-      const candidates = document.querySelectorAll("main h1, main h2, main h3, main p, main .mono, main blockquote, main figcaption, main span.accent, main .display");
+      const candidates = document.querySelectorAll("main h1, main h2, main h3, main p, main .mono, main blockquote, main figcaption, main span.accent, main .display, main img, main article, main .soft-card, main .spec-media, main .int-hub, main section > .site-shell > .grid, main section > .site-shell > .reveal");
       const blurEls = [];
       for (const el of candidates) {
         if (el.closest("#top")) continue;
         if (el.closest("[data-hs-section]")) continue;
         if (el.closest(".marquee")) continue;
         if (el.closest("header")) continue;
+        if (el.closest("footer")) continue;
+        if (el.closest("nav")) continue;
         if (el.closest("details p")) continue;
         if (el.closest("[data-hero-meters]")) continue;
+        if (el.closest(".spec-group")) continue;
+        if (el.closest(".tools-marquee")) continue;
+        if (el.closest(".spec-dots")) continue;
+        if (el.closest(".spec-nav")) continue;
         if (el.parentElement && el.parentElement.classList.contains("blur-reveal")) continue;
         el.classList.add("blur-reveal");
         blurEls.push(el);

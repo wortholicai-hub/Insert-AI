@@ -1,6 +1,6 @@
 ---
 import { site } from "../data/site";
-const year = 2026;
+const year = 2023;
 ---
 
 <footer class="pb-10 pt-6">
@@ -14,7 +14,7 @@ const year = 2026;
           We insert AI into your business and build the software that makes it real. Custom AI, automation, and software engineering for companies at every stage.
         </p>
         <div class="mt-5 flex gap-2">
-          <a href="#" aria-label="LinkedIn" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
+          <a href="https://www.linkedin.com/company/insert-artificial-intelligence/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           </a>
           <a href="#" aria-label="X (Twitter)" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
@@ -44,7 +44,6 @@ const year = 2026;
         <ul class="space-y-3 text-sm text-white/58">
           <li><a class="link-sweep hover:text-white" href="#about">About Us</a></li>
           <li><a class="link-sweep hover:text-white" href="#process">Careers</a></li>
-          <li><a class="link-sweep hover:text-white" href="#insights">Insights</a></li>
           <li><a class="link-sweep hover:text-white" href={`mailto:${site.email}`}>Contact</a></li>
         </ul>
       </div>
@@ -54,8 +53,7 @@ const year = 2026;
         <ul class="space-y-3 text-sm text-white/58">
           <li><a class="link-sweep hover:text-white" href="#work">Case Studies</a></li>
           <li><a class="link-sweep hover:text-white" href="#insights">Blog</a></li>
-          <li><a class="link-sweep hover:text-white" href="#process">Guides</a></li>
-          <li><a class="link-sweep hover:text-white" href="#insights">Newsletter</a></li>
+          <li><button class="link-sweep hover:text-white cursor-pointer" type="button" data-legal="guides">Guides</button></li>
         </ul>
       </div>
 
@@ -460,6 +458,168 @@ const year = 2026;
 
         <div class="legal-footer-note">
           <span>&#9679;</span> Last updated: July 2026 &mdash; InsertAI
+        </div>
+      `
+    },
+    guides: {
+      title: 'Client Engagement Guide',
+      html: `
+        <div class="legal-intro">
+          <span class="legal-badge">How We Work Together</span>
+          <p>A complete walkthrough of our engagement process — from your first inquiry to long-term partnership. This guide helps you understand exactly what to expect at every stage when working with InsertAI.</p>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">01</span>
+            <span class="legal-section-title">Choose Your Focus Area</span>
+          </div>
+          <p>Start by identifying what you need. We specialize across these core verticals:</p>
+          <ul>
+            <li><strong>Internal Dashboards</strong> — Real-time analytics, KPI tracking, and operational control panels for your team</li>
+            <li><strong>SaaS Platforms</strong> — Multi-tenant products with auth, billing, AI features, and admin layers</li>
+            <li><strong>Custom Web Applications</strong> — Bespoke portals, client-facing platforms, and business tools</li>
+            <li><strong>Workflow &amp; CRM Automations</strong> — End-to-end automation connecting your existing tools (HubSpot, Salesforce, QuickBooks, etc.)</li>
+            <li><strong>AI Voice Agents</strong> — Inbound/outbound voice AI wired to your CRM and scheduling</li>
+            <li><strong>AI Chat Agents</strong> — Intelligent support and sales bots that qualify leads and take action</li>
+            <li><strong>RAG Knowledge Systems</strong> — Enterprise search over your documents with sourced, accurate answers</li>
+          </ul>
+          <p>Not sure which fits? No problem — that's what the discovery call is for.</p>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">02</span>
+            <span class="legal-section-title">Book a Strategy Session</span>
+          </div>
+          <p>Schedule a <strong>free 30-minute strategy session</strong> with our team. During this call, we:</p>
+          <ul>
+            <li>Understand your business, goals, and current tech stack</li>
+            <li>Identify the highest-impact opportunity for AI or automation</li>
+            <li>Assess technical feasibility and timeline</li>
+            <li>Answer any questions about our process, pricing, or capabilities</li>
+          </ul>
+          <p>No sales pressure — this is a genuine technical consultation to determine if we're the right fit.</p>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">03</span>
+            <span class="legal-section-title">Discovery &amp; Scoping</span>
+          </div>
+          <p>Once we agree to move forward, we conduct a deep-dive discovery phase:</p>
+          <ul>
+            <li><strong>Requirements Workshop</strong> — Detailed mapping of your workflows, pain points, and desired outcomes</li>
+            <li><strong>Technical Architecture</strong> — We design the system architecture, integrations, and data flow</li>
+            <li><strong>Scope Document &amp; SOW</strong> — A clear Statement of Work outlining deliverables, milestones, timeline, and investment</li>
+            <li><strong>NDA &amp; Agreements</strong> — We sign mutual NDAs and project agreements to protect both parties</li>
+          </ul>
+          <p>You'll know exactly what you're getting, when, and for how much — before any build begins.</p>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">04</span>
+            <span class="legal-section-title">Design &amp; Prototyping</span>
+          </div>
+          <p>Before writing production code, we validate the approach:</p>
+          <ul>
+            <li><strong>UI/UX Wireframes</strong> — Interactive mockups of key screens and user flows</li>
+            <li><strong>Proof of Concept</strong> — For AI/automation projects, we build a working prototype to validate the core logic</li>
+            <li><strong>Client Review</strong> — You review and approve designs before we proceed to full development</li>
+            <li><strong>Iteration</strong> — We refine based on your feedback until the blueprint is right</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">05</span>
+            <span class="legal-section-title">Build &amp; Development</span>
+          </div>
+          <p>Our engineering team builds your system with full transparency:</p>
+          <ul>
+            <li><strong>Agile Sprints</strong> — 1–2 week cycles with demos at the end of each sprint</li>
+            <li><strong>Dedicated Slack/Teams Channel</strong> — Real-time communication throughout the build</li>
+            <li><strong>Progress Updates</strong> — Weekly status reports with screenshots and recordings</li>
+            <li><strong>Staging Environment</strong> — You can test every feature as it's built, not just at the end</li>
+            <li><strong>Code Quality</strong> — Clean, documented, production-grade code with automated testing</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">06</span>
+            <span class="legal-section-title">Testing &amp; QA</span>
+          </div>
+          <p>Every system goes through rigorous quality assurance:</p>
+          <ul>
+            <li><strong>Functional Testing</strong> — Every feature tested against requirements</li>
+            <li><strong>Integration Testing</strong> — All third-party connections verified end-to-end</li>
+            <li><strong>Performance Testing</strong> — Load testing and optimization for production scale</li>
+            <li><strong>Security Audit</strong> — Vulnerability scanning, data encryption verification, and access control review</li>
+            <li><strong>UAT (User Acceptance Testing)</strong> — You and your team validate the system before launch</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">07</span>
+            <span class="legal-section-title">Launch &amp; Deployment</span>
+          </div>
+          <p>We handle the full production deployment:</p>
+          <ul>
+            <li><strong>Infrastructure Setup</strong> — Cloud hosting, domains, SSL, CDN, and monitoring</li>
+            <li><strong>Data Migration</strong> — Safe migration of existing data into the new system</li>
+            <li><strong>Go-Live Support</strong> — Our team is on standby during and after launch</li>
+            <li><strong>Team Training</strong> — Hands-on training sessions and documentation for your team</li>
+            <li><strong>Handover Package</strong> — Full documentation, architecture diagrams, and admin credentials</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">08</span>
+            <span class="legal-section-title">Post-Launch Support</span>
+          </div>
+          <p>We don't disappear after launch. Every project includes:</p>
+          <ul>
+            <li><strong>30-Day Warranty</strong> — Free bug fixes and adjustments post-launch</li>
+            <li><strong>Monitoring &amp; Alerts</strong> — Proactive system health monitoring</li>
+            <li><strong>Priority Support</strong> — Direct access to the engineering team for urgent issues</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">09</span>
+            <span class="legal-section-title">Long-Term Partnership</span>
+          </div>
+          <p>Most of our clients stay with us beyond the first project. We offer:</p>
+          <ul>
+            <li><strong>Retainer Plans</strong> — Monthly development hours for ongoing features, improvements, and maintenance</li>
+            <li><strong>Scaling Support</strong> — As your business grows, we scale the systems to match</li>
+            <li><strong>New Module Development</strong> — Expand your platform with additional features and integrations</li>
+            <li><strong>Dedicated CTO Advisory</strong> — Strategic technical guidance for your product roadmap</li>
+            <li><strong>Priority Scheduling</strong> — Retainer clients get priority access to our engineering capacity</li>
+          </ul>
+          <p>Think of us as your in-house tech team — without the overhead.</p>
+        </div>
+
+        <div class="legal-section">
+          <div class="legal-section-header">
+            <span class="legal-section-num">10</span>
+            <span class="legal-section-title">Ready to Start?</span>
+          </div>
+          <p>The best way to begin is with a free strategy session. We'll assess your needs, recommend the right approach, and give you a clear picture of timeline and investment — no commitment required.</p>
+          <p><strong>Book your free consultation today and let's build something exceptional together.</strong></p>
+          <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;justify-content:space-between;">
+            <a href="https://calendly.com/insertai/strategy-call" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:999px;background:linear-gradient(135deg,#725eff,#4e73ff 52%,#9b5cff);color:#fff;font-size:0.8rem;font-weight:700;text-decoration:none;box-shadow:0 8px 20px rgba(85,94,255,0.35);transition:transform 0.2s ease,box-shadow 0.2s ease;">Book a Call &rarr;</a>
+            <a href="mailto:hello@insertai.com" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:999px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);font-size:0.8rem;font-weight:600;text-decoration:none;transition:background 0.2s ease,border-color 0.2s ease;">Email Us &rarr;</a>
+          </div>
+        </div>
+
+        <div class="legal-footer-note">
+          <span>&#9679;</span> InsertAI &mdash; The last technical partner your business will ever need.
         </div>
       `
     }
