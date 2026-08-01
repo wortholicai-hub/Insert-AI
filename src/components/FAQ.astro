@@ -1,4 +1,17 @@
 ---
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    { "@type": "Question", name: "How fast can we go live?", acceptedAnswer: { "@type": "Answer", text: "Most clients have their first automation or voice agent live within 14 days of the strategy call. Larger multi-system builds roll out in phases so you see value early." } },
+    { "@type": "Question", name: "Do your AI voice agents really sound human?", acceptedAnswer: { "@type": "Answer", text: "Yes. They use the latest conversational voice models with natural pacing and interruption handling. Most callers can't tell - and they book, qualify, and route like a great receptionist would." } },
+    { "@type": "Question", name: "Will this work with QuickBooks and HubSpot?", acceptedAnswer: { "@type": "Answer", text: "Absolutely. QuickBooks, HubSpot, Stripe, Xero and 200+ apps are core to what we do. If a tool has an API, we can connect it - and we build custom connectors when one doesn't exist." } },
+    { "@type": "Question", name: "Is my data secure?", acceptedAnswer: { "@type": "Answer", text: "We follow least-privilege access, encrypt data in transit, and monitor every workflow 24/7. We're happy to sign an NDA and work within your compliance requirements." } },
+    { "@type": "Question", name: "What does it cost?", acceptedAnswer: { "@type": "Answer", text: "It depends on scope, but we price around ROI - most automations pay for themselves within a month or two. You get a clear, fixed quote after the free strategy call. No surprises." } },
+    { "@type": "Question", name: "Do I need technical knowledge?", acceptedAnswer: { "@type": "Answer", text: "None. It's fully done-for-you. We handle building, integrating, testing, and monitoring - you just tell us what's eating your team's time." } },
+  ],
+};
+
 const faqs = [
   { q: "How fast can we go live?", a: "Most clients have their first automation or voice agent live within 14 days of the strategy call. Larger multi-system builds roll out in phases so you see value early." },
   { q: "Do your AI voice agents really sound human?", a: "Yes. They use the latest conversational voice models with natural pacing and interruption handling. Most callers can't tell - and they book, qualify, and route like a great receptionist would." },
@@ -37,4 +50,5 @@ const faqs = [
       ))}
     </div>
   </div>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </section>

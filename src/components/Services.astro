@@ -177,7 +177,9 @@ const capabilities = [
             {c.media.map((src, si) => (
               <img
                 src={src}
-                alt={`${c.title} ${si + 1}`}
+                alt={`${c.title} - ${c.desc} Screenshot ${si + 1}`}
+                width="1200"
+                height="800"
                 draggable="false"
                 loading={gi === 0 && si === 0 ? "eager" : "lazy"}
                 decoding="async"

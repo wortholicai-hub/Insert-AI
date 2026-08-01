@@ -1,4 +1,8 @@
+# InsertAI - https://agency.insertai.com
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /_astro/
 
+# Sitemaps
 Sitemap: https://agency.insertai.com/sitemap-index.xml

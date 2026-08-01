@@ -82,14 +82,14 @@ const groupNodes = logoGroups.map((g, i) => ({
       </svg>
 
       <div class="int-hub-core">
-        <img src="/assets/agency-logo/insert ai logo svg black bk.svg" alt="InsertAI" class="h-[100px] w-auto -my-9" />
+        <img src="/assets/agency-logo/insert ai logo svg black bk.svg" alt="InsertAI" width="200" height="100" class="h-[100px] w-auto -my-9" />
       </div>
 
       {groupNodes.map((n, i) => (
         <div class="grp-node" style={`left:${n.left}%;top:${n.top}%;animation-delay:${i * 0.4}s`}>
           <span class="grp-glow" style={`animation-delay:${i < 2 ? 0 : 7}s`}></span>
           <div class="grp-icons">
-            {n.icons.map((u) => <img src={u} alt="" loading="lazy" decoding="async" />)}
+            {n.icons.map((u) => <img src={u} alt="" width="28" height="26" loading="lazy" decoding="async" />)}
             {n.more > 0 && <span class="grp-more">+{n.more}</span>}
           </div>
           <span class="grp-label">{n.label}</span>
