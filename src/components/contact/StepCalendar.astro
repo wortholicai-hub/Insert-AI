@@ -1,0 +1,515 @@
+---
+/**
+ * Step 7 — date & time. DESIGN MOCKUP.
+ *
+ * Dates, the month grid and timezone conversion are real (Intl-based).
+ * Only *availability* is simulated: a deterministic hash stands in for the
+ * scheduling provider, so a given day always shows the same slots. Replace
+ * `loadAvailability()` with a Cal.com / Google free-busy call and nothing
+ * else here changes.
+ *
+ * Only bookable days are clickable and only open times are listed — the
+ * funnel never shows a choice that isn't actually available.
+ */
+import { meetingTypes } from "../../data/funnel";
+---
+
+<div class="cal" data-calendar>
+  <div class="cal-types" data-cal-types>
+    {meetingTypes.map((t, i) => (
+      <label class="cal-type">
+        <input type="radio" name="meetingType" value={t.id} data-mins={t.mins} data-label={t.label} class="sr-only" checked={i === 0} />
+        <span class="cal-type-top">
+          <span class="cal-type-label">{t.label}</span>
+          <span class="cal-type-mins">{t.mins} min</span>
+        </span>
+        <span class="cal-type-desc">{t.desc}</span>
+        <span class="cal-type-rec" data-cal-rec hidden>Recommended</span>
+      </label>
+    ))}
+  </div>
+
+  <div class="cal-cols">
+    <div class="cal-month-col">
+      <div class="cal-monthbar">
+        <button type="button" class="cal-nav" data-cal-prev aria-label="Previous month">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <p class="cal-month" data-cal-month aria-live="polite">—</p>
+        <button type="button" class="cal-nav" data-cal-next aria-label="Next month">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="cal-dow" aria-hidden="true">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cal-grid" data-cal-grid role="grid" aria-label="Available dates"></div>
+
+      <div class="cal-tz">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <label class="sr-only" for="cal-tz">Timezone</label>
+        <select id="cal-tz" data-cal-tz></select>
+      </div>
+    </div>
+
+    <div class="cal-slot-col">
+      <p class="cal-slots-head" data-cal-slotshead>Select a date</p>
+      <div class="cal-slots" data-cal-slots></div>
+    </div>
+  </div>
+</div>
+
+<!-- Global, not scoped: day cells and time slots are built at runtime, so they
+     carry no Astro scope attribute. All selectors are `.cal-*`-prefixed. -->
+<style is:global>
+  .cal-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    /* Top margin clears the "Recommended" badge, which sits above the card. */
+    margin: 2rem 0 1.6rem;
+  }
+  .cal-type {
+    position: relative;
+    display: block;
+    padding: 0.85rem 0.95rem;
+    border-radius: 12px;
+    border: 1px solid var(--color-edge);
+    background: var(--color-surface-2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .cal-type:hover { border-color: var(--color-edge-2); }
+  .cal-type:has(input:checked) {
+    border-color: var(--color-acc);
+    background: var(--color-surface-3);
+  }
+  .cal-type:has(input:focus-visible) { outline: 2px solid var(--color-acc-2); outline-offset: 2px; }
+  .cal-type-top { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
+  .cal-type-label { color: #fff; font-size: 0.86rem; font-weight: 640; }
+  .cal-type-mins {
+    padding: 0.1rem 0.42rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-edge-2);
+    color: var(--color-fg-dim);
+    font-size: 0.64rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .cal-type-desc {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--color-fg-dim);
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+  .cal-type-rec {
+    position: absolute;
+    top: -8px;
+    left: 0.9rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--color-acc-2);
+    color: #04121a;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .cal-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .cal-monthbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+  .cal-month { color: #fff; font-size: 0.92rem; font-weight: 650; letter-spacing: -0.01em; }
+  .cal-nav {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    border: 1px solid var(--color-edge);
+    background: var(--color-surface-2);
+    color: var(--color-fg-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .cal-nav:hover:not(:disabled) { border-color: var(--color-acc); color: #fff; background: var(--color-surface-3); }
+  .cal-nav:disabled { opacity: 0.28; cursor: not-allowed; }
+
+  .cal-dow, .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-dow {
+    margin-bottom: 5px;
+    color: var(--color-fg-dim);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .cal-day {
+    position: relative;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-fg-muted);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 550;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .cal-day.is-blank { visibility: hidden; pointer-events: none; }
+  .cal-day.is-free {
+    border-color: var(--color-edge);
+    background: var(--color-surface-2);
+    color: #dfe3ff;
+  }
+  .cal-day.is-free:hover { border-color: var(--color-acc); background: var(--color-surface-3); color: #fff; }
+  .cal-day.is-free::after {
+    content: "";
+    position: absolute;
+    bottom: 6px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--color-acc-2);
+  }
+  .cal-day:disabled { color: var(--color-fg-dim); opacity: 0.32; cursor: not-allowed; }
+  .cal-day.is-today { box-shadow: inset 0 0 0 1px var(--color-edge-2); }
+  .cal-day.is-selected {
+    border-color: #5b52f0;
+    background: #5b52f0;
+    color: #fff;
+  }
+  .cal-day.is-selected::after { background: #fff; }
+  .cal-day:focus-visible { outline: 2px solid var(--color-acc-2); outline-offset: 2px; }
+
+  .cal-tz {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-edge);
+    color: var(--color-fg-dim);
+  }
+  .cal-tz select {
+    flex: 1;
+    min-width: 0;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--color-fg-muted);
+    font-family: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+    outline: none;
+  }
+  .cal-tz select option { background: var(--color-surface-2); color: #fff; }
+
+  .cal-slots-head {
+    margin-bottom: 0.65rem;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 640;
+  }
+  .cal-slots-sub {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--color-fg-dim);
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+  .cal-slots {
+    display: grid;
+    gap: 0.45rem;
+    max-height: 330px;
+    overflow-y: auto;
+    padding-right: 0.3rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-edge-2) transparent;
+  }
+  .cal-slot {
+    padding: 0.68rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-edge);
+    background: var(--color-surface-2);
+    color: #dfe3ff;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    animation: cal-slot-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes cal-slot-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+  }
+  .cal-slot:hover { border-color: var(--color-acc); background: var(--color-surface-3); color: #fff; }
+  .cal-slot.is-selected { border-color: #5b52f0; background: #5b52f0; color: #fff; }
+  .cal-slot:focus-visible { outline: 2px solid var(--color-acc-2); outline-offset: 2px; }
+  .cal-empty {
+    padding: 1rem 0;
+    color: var(--color-fg-dim);
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 760px) {
+    .cal-types { grid-template-columns: 1fr; }
+    .cal-cols { grid-template-columns: 1fr; gap: 1.6rem; }
+    .cal-slots { max-height: 220px; grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-calendar]");
+
+  if (root) {
+    const gridEl = root.querySelector<HTMLElement>("[data-cal-grid]")!;
+    const monthEl = root.querySelector<HTMLElement>("[data-cal-month]")!;
+    const slotsEl = root.querySelector<HTMLElement>("[data-cal-slots]")!;
+    const slotsHead = root.querySelector<HTMLElement>("[data-cal-slotshead]")!;
+    const tzSelect = root.querySelector<HTMLSelectElement>("[data-cal-tz]")!;
+    const prevBtn = root.querySelector<HTMLButtonElement>("[data-cal-prev]")!;
+    const nextBtn = root.querySelector<HTMLButtonElement>("[data-cal-next]")!;
+
+    /* ── Timezones ─────────────────────────────────────────── */
+    const ZONES = [
+      "America/Los_Angeles", "America/Denver", "America/Chicago", "America/New_York",
+      "America/Sao_Paulo", "Europe/London", "Europe/Berlin", "Europe/Istanbul",
+      "Africa/Lagos", "Asia/Dubai", "Asia/Karachi", "Asia/Kolkata",
+      "Asia/Singapore", "Asia/Tokyo", "Australia/Sydney", "UTC",
+    ];
+    const local = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    if (!ZONES.includes(local)) ZONES.unshift(local);
+
+    const now = new Date();
+    const offsetLabel = (tz: string) =>
+      new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" })
+        .formatToParts(now).find((p) => p.type === "timeZoneName")?.value || "";
+
+    ZONES.forEach((z) => {
+      const opt = document.createElement("option");
+      opt.value = z;
+      opt.textContent = `${z.replace(/_/g, " ")} · ${offsetLabel(z)}`;
+      if (z === local) opt.selected = true;
+      tzSelect.appendChild(opt);
+    });
+
+    /* ── Simulated availability provider ───────────────────── */
+    const hash = (s: string) => {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h >>> 0;
+    };
+    const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+
+    /** Working window, anchored in UTC: 13:00 – 21:30 UTC ≈ 9am – 5:30pm ET. */
+    const WINDOW_START = 13;
+    const SLOT_COUNT = 18;
+
+    /** Returns only the times that are actually free. */
+    const loadAvailability = (d: Date) => {
+      const key = dayKey(d);
+      const out: Date[] = [];
+      for (let i = 0; i < SLOT_COUNT; i++) {
+        if (hash(`${key}:${i}`) % 10 < 4) continue; // taken
+        out.push(new Date(Date.UTC(
+          d.getFullYear(), d.getMonth(), d.getDate(),
+          WINDOW_START + Math.floor(i / 2), (i % 2) * 30
+        )));
+      }
+      return out;
+    };
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const horizon = new Date(startOfToday);
+    horizon.setDate(horizon.getDate() + 60);
+
+    const isBookable = (d: Date) => {
+      if (d < startOfToday || d > horizon) return false;
+      const wd = d.getDay();
+      if (wd === 0 || wd === 6) return false;
+      return hash(dayKey(d)) % 11 !== 0;
+    };
+
+    /* ── State ─────────────────────────────────────────────── */
+    let cursor = new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1);
+    let selectedDate: Date | null = null;
+    let selectedSlot: Date | null = null;
+
+    const tz = () => tzSelect.value;
+    const fmtTime = (d: Date) =>
+      new Intl.DateTimeFormat("en-US", { timeZone: tz(), hour: "numeric", minute: "2-digit" }).format(d);
+    const fmtLong = (d: Date) =>
+      new Intl.DateTimeFormat("en-US", { timeZone: tz(), weekday: "long", month: "long", day: "numeric" }).format(d);
+
+    const meeting = () => {
+      const input = root.querySelector<HTMLInputElement>('input[name="meetingType"]:checked')!;
+      return { label: input.dataset.label!, mins: Number(input.dataset.mins) };
+    };
+
+    /** Tells the funnel whether step 7 is satisfied, and what to summarise. */
+    const publish = () => {
+      if (!selectedSlot) {
+        window.dispatchEvent(new CustomEvent("funnel:slot", { detail: null }));
+        return;
+      }
+      const { label, mins } = meeting();
+      const end = new Date(selectedSlot.getTime() + mins * 60000);
+      window.dispatchEvent(new CustomEvent("funnel:slot", {
+        detail: {
+          iso: selectedSlot.toISOString(),
+          when: `${fmtLong(selectedSlot)}, ${fmtTime(selectedSlot)} – ${fmtTime(end)}`,
+          timezone: tz(),
+          meeting: label,
+          mins,
+        },
+      }));
+    };
+
+    /* ── Rendering ─────────────────────────────────────────── */
+    const renderMonth = () => {
+      monthEl.textContent = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(cursor);
+
+      const firstWeekday = new Date(cursor.getFullYear(), cursor.getMonth(), 1).getDay();
+      const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+
+      gridEl.innerHTML = "";
+      for (let i = 0; i < firstWeekday; i++) {
+        const blank = document.createElement("div");
+        blank.className = "cal-day is-blank";
+        gridEl.appendChild(blank);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+        const free = isBookable(date);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cal-day";
+        btn.textContent = String(day);
+        btn.setAttribute("aria-label", fmtLong(date) + (free ? " — times available" : " — unavailable"));
+
+        if (free) btn.classList.add("is-free");
+        else btn.disabled = true;
+
+        if (date.getTime() === startOfToday.getTime()) btn.classList.add("is-today");
+        if (selectedDate && date.getTime() === selectedDate.getTime()) btn.classList.add("is-selected");
+
+        btn.addEventListener("click", () => selectDate(date));
+        gridEl.appendChild(btn);
+      }
+
+      prevBtn.disabled =
+        cursor.getFullYear() === startOfToday.getFullYear() && cursor.getMonth() === startOfToday.getMonth();
+      nextBtn.disabled = cursor > horizon;
+    };
+
+    const renderSlots = () => {
+      slotsEl.innerHTML = "";
+      if (!selectedDate) {
+        slotsHead.textContent = "Select a date";
+        return;
+      }
+
+      const slots = loadAvailability(selectedDate);
+      slotsHead.innerHTML = "";
+      slotsHead.append(fmtLong(selectedDate));
+      const sub = document.createElement("span");
+      sub.className = "cal-slots-sub";
+      sub.textContent = `${slots.length} time${slots.length === 1 ? "" : "s"} available`;
+      slotsHead.appendChild(sub);
+
+      if (!slots.length) {
+        const empty = document.createElement("p");
+        empty.className = "cal-empty";
+        empty.textContent = "Nothing free on this day. Try another date.";
+        slotsEl.appendChild(empty);
+        return;
+      }
+
+      slots.forEach((at, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cal-slot";
+        btn.textContent = fmtTime(at);
+        btn.style.animationDelay = `${i * 20}ms`;
+        if (selectedSlot && at.getTime() === selectedSlot.getTime()) btn.classList.add("is-selected");
+        btn.addEventListener("click", () => {
+          selectedSlot = at;
+          renderSlots();
+          publish();
+        });
+        slotsEl.appendChild(btn);
+      });
+    };
+
+    const selectDate = (date: Date) => {
+      selectedDate = date;
+      selectedSlot = null;
+      renderMonth();
+      renderSlots();
+      publish();
+    };
+
+    /* ── Events ────────────────────────────────────────────── */
+    prevBtn.addEventListener("click", () => {
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+      renderMonth();
+    });
+    nextBtn.addEventListener("click", () => {
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+      renderMonth();
+    });
+
+    tzSelect.addEventListener("change", () => { renderSlots(); publish(); });
+    root.querySelectorAll('input[name="meetingType"]').forEach((el) =>
+      el.addEventListener("change", publish)
+    );
+
+    // The funnel tells us which call length suits the answers given.
+    window.addEventListener("funnel:recommend", (e) => {
+      const { id } = (e as CustomEvent).detail as { id: string };
+      root.querySelectorAll<HTMLElement>("[data-cal-rec]").forEach((el) => { el.hidden = true; });
+      const input = root.querySelector<HTMLInputElement>(`input[name="meetingType"][value="${id}"]`);
+      if (!input) return;
+      input.checked = true;
+      const badge = input.closest(".cal-type")?.querySelector<HTMLElement>("[data-cal-rec]");
+      if (badge) badge.hidden = false;
+      publish();
+    });
+
+    /* ── Boot: land on the next bookable day ───────────────── */
+    renderMonth();
+    const seek = new Date(startOfToday);
+    for (let i = 0; i < 14; i++) {
+      seek.setDate(seek.getDate() + 1);
+      if (isBookable(seek)) { selectDate(new Date(seek)); break; }
+    }
+  }
+</script>

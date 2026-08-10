@@ -1,0 +1,227 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import BriefStudio from "../components/contact/BriefStudio.astro";
+import { site } from "../data/site";
+
+/** The three promises, in the gradient band that bridges to the site's CTA panel. */
+const promises = [
+  { t: "Answer as little as you like", d: "A name, an email and one line is a complete submission. Everything else is optional." },
+  { t: "Talk instead of typing", d: "Describe the project out loud and it fills itself in. Correct anything it gets wrong." },
+  { t: "Read by an engineer", d: "Not a sales inbox. Whoever replies has built something like it before." },
+];
+
+const faqs = [
+  {
+    q: "I only want a rough price. Do I have to fill this in?",
+    a: "No. Ask the question in the box on the left, add your name and email, and send. That's a valid submission and you'll get an answer.",
+  },
+  {
+    q: "What happens to what I type?",
+    a: "Nothing leaves your browser until you press send. The assistant runs on the page itself — there's no transcript sitting on a server while you think.",
+  },
+  {
+    q: "Can I change what the assistant filled in?",
+    a: "Any answer it suggests is marked and sits one tap from being undone. It never overwrites something you've edited yourself.",
+  },
+  {
+    q: "We're a government or enterprise buyer.",
+    a: "Say so under project type and the form will ask about procurement, funding and approvals instead of the questions that don't apply to you.",
+  },
+];
+---
+
+<Base
+  title="Start a project - InsertAI"
+  description="Describe your project in your own words — or out loud — and our assistant builds the brief with you. A name, an email and one line is enough to get an answer."
+>
+  <Nav />
+
+  <main data-no-blur>
+    <!-- ══ Hero ═══════════════════════════════════════════════ -->
+    <section class="pt-36 pb-8 sm:pt-40 sm:pb-10">
+      <div class="ct-shell">
+        <div class="ct-hero">
+          <p class="mono text-[var(--color-acc-2)]">Start a project</p>
+          <h1 class="display mt-5 text-[clamp(2.1rem,4.6vw,3.5rem)]">
+            Tell us what you need.<br />
+            <span class="accent">We'll shape the brief with you.</span>
+          </h1>
+          <p class="ct-lede">
+            Describe it in a sentence, or say it out loud. The assistant on this page turns
+            what you tell it into a proper project brief — and only ever asks about the parts
+            that apply to you.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ Promise band — the visual bridge to the site's CTA panel ══ -->
+    <section class="pb-9">
+      <div class="ct-shell">
+        <div class="ct-band">
+          <div class="ct-band-wash" aria-hidden="true"></div>
+          <div class="ct-band-grid">
+            {promises.map((p) => (
+              <article>
+                <h2 class="ct-band-t">{p.t}</h2>
+                <p class="ct-band-d">{p.d}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ The form ═══════════════════════════════════════════ -->
+    <section id="brief" class="pb-16 scroll-mt-24">
+      <div class="ct-shell">
+        <BriefStudio />
+      </div>
+    </section>
+
+    <!-- ══ Questions people actually ask here ═════════════════ -->
+    <section class="pb-24">
+      <div class="ct-shell">
+        <div class="ct-faq">
+          <h2 class="ct-faq-head">Before you start</h2>
+          <div class="ct-faq-grid">
+            {faqs.map((f) => (
+              <article class="ct-faq-item">
+                <h3>{f.q}</h3>
+                <p>{f.a}</p>
+              </article>
+            ))}
+          </div>
+
+          <p class="ct-contact-line">
+            Would rather just email or call?
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+            <span class="ct-dot" aria-hidden="true"></span>
+            <a href={site.voiceAgentPhoneHref}>{site.voiceAgentPhone}</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .ct-shell {
+    width: min(100% - 2rem, 1280px);
+    margin-inline: auto;
+  }
+
+  .ct-hero {
+    max-width: 46rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .ct-lede {
+    max-width: 36rem;
+    margin: 1.4rem auto 0;
+    color: var(--color-fg-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* Same gradient recipe as the "Ready to build" panel, so the form reads
+     as part of the same product rather than a separate utility page. */
+  .ct-band {
+    position: relative;
+    overflow: hidden;
+    padding: 1.6rem 1.7rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(120deg, rgba(27, 47, 151, 0.9), rgba(40, 96, 255, 0.82) 42%, rgba(143, 50, 222, 0.92));
+    box-shadow: 0 24px 70px rgba(74, 84, 255, 0.22);
+  }
+  .ct-band-wash {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+    mix-blend-mode: screen;
+    background: url("/assets/generated/liquid-glass.webp") center / cover;
+  }
+  .ct-band-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem 2rem;
+  }
+  .ct-band-t {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 640;
+    letter-spacing: -0.012em;
+  }
+  .ct-band-d {
+    margin-top: 0.4rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.815rem;
+    line-height: 1.6;
+  }
+
+  .ct-faq {
+    max-width: 62rem;
+    margin-inline: auto;
+    padding-top: 2.6rem;
+    border-top: 1px solid var(--color-edge);
+  }
+  .ct-faq-head {
+    margin-bottom: 1.6rem;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 640;
+    letter-spacing: -0.015em;
+    text-align: center;
+  }
+  .ct-faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .ct-faq-item {
+    padding: 1.1rem 1.2rem;
+    border-radius: 14px;
+    border: 1px solid #273052;
+    background: #101627;
+  }
+  .ct-faq-item h3 {
+    color: #f1f3ff;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 620;
+    letter-spacing: -0.01em;
+  }
+  .ct-faq-item p {
+    margin-top: 0.4rem;
+    color: #a3abc7;
+    font-size: 0.815rem;
+    line-height: 1.68;
+  }
+
+  .ct-contact-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 2rem;
+    color: #737b9c;
+    font-size: 0.83rem;
+  }
+  .ct-contact-line a { color: #a3abc7; transition: color 0.2s; }
+  .ct-contact-line a:hover { color: #fff; }
+  .ct-dot { width: 3px; height: 3px; border-radius: 50%; background: #36426c; }
+
+  @media (max-width: 900px) {
+    .ct-band-grid { grid-template-columns: 1fr; gap: 1.1rem; }
+    .ct-faq-grid { grid-template-columns: 1fr; }
+  }
+</style>

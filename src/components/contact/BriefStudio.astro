@@ -1,0 +1,1120 @@
+---
+/**
+ * The whole contact experience: one page, one form, no popups.
+ *
+ * Left rail  — the consultant, the brief-strength meter and the send
+ *              button. Sticky, so the way out is always on screen and the
+ *              page never feels like something you're trapped inside.
+ * Right side — the brief itself, in parts, rendered from data/brief.ts.
+ *
+ * Everything below the shell is built at runtime by lib/studio.ts, so the
+ * styles here are global and `.bf-`-prefixed rather than scoped.
+ */
+import StepCalendar from "./StepCalendar.astro";
+import { site } from "../../data/site";
+---
+
+<div class="bf" data-studio>
+  <div class="bf-panel" data-form-panel>
+    <div class="bf-grid">
+      <!-- ══ Left rail — consultant, meter, send ══════════════ -->
+      <aside class="bf-rail">
+        <div class="bf-rail-inner">
+          <section class="bf-consultant">
+            <header class="bf-con-head">
+              <span class="bf-orb" aria-hidden="true"></span>
+              <div class="min-w-0">
+                <p class="bf-con-name">Ada <span class="bf-con-tag">Consultant</span></p>
+                <p class="bf-con-status" data-con-status>Type, or hold the microphone to talk</p>
+              </div>
+            </header>
+
+            <div class="bf-thread" data-con-thread role="log" aria-live="polite"></div>
+
+            <div class="bf-quicks" data-con-chips></div>
+
+            <form class="bf-composer" data-con-form>
+              <label class="sr-only" for="con-field">Describe your project</label>
+              <textarea id="con-field" data-con-field rows="1" placeholder="Describe what you need…" autocomplete="off"></textarea>
+              <button type="button" class="bf-mic" data-con-mic aria-label="Speak your answer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
+              </button>
+              <button type="submit" class="bf-send-msg" aria-label="Send message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </form>
+          </section>
+
+          <section class="bf-meter-card">
+            <div class="bf-meter-top">
+              <p class="bf-meter-label" data-meter-label>Nothing yet</p>
+              <p class="bf-meter-pct" data-meter-pct>0%</p>
+            </div>
+            <div class="bf-meter" role="progressbar" aria-label="Brief strength">
+              <span class="bf-meter-fill" data-meter-fill data-tier="empty"></span>
+            </div>
+            <p class="bf-meter-note" data-meter-note>Tell us anything at all and we can take it from there.</p>
+
+            <div class="bf-readback" data-readback hidden></div>
+
+            <button type="button" class="bf-send" data-send disabled>
+              <span data-send-label>Send to the team</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <p class="bf-send-hint" data-send-hint>We need a name, an email, and one line about what you need.</p>
+          </section>
+        </div>
+      </aside>
+
+      <!-- ══ Right — the brief ═══════════════════════════════ -->
+      <div class="bf-main">
+        <div data-studio-sections></div>
+
+        <section class="bf-section bf-book">
+          <header class="bf-section-head">
+            <span class="bf-eyebrow">Optional</span>
+            <h2 class="bf-section-title">Want to pick a time now?</h2>
+            <p class="bf-section-blurb">
+              Only slots we're genuinely free are shown. Skip it and we'll send you times
+              by email instead — it makes no difference to how quickly we read this.
+            </p>
+          </header>
+
+          <!-- On by default: most people who reach this point want a time.
+               Turning it off is one tap and costs them nothing. -->
+          <label class="bf-switch">
+            <input type="checkbox" data-book-toggle checked />
+            <span class="bf-switch-track" aria-hidden="true"><i></i></span>
+            <span class="bf-switch-text">Book a call as part of this</span>
+          </label>
+
+          <div class="bf-book-body" data-book-body>
+            <StepCalendar />
+          </div>
+        </section>
+
+        <p class="bf-reassure">
+          Nothing here is stored until you press send. Prefer email?
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Confirmation, in place ════════════════════════════════ -->
+  <section class="bf-done" data-done hidden>
+    <div class="bf-done-icon" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <h2 class="bf-done-title">That's with us.</h2>
+    <p class="bf-done-when" data-done-when></p>
+    <p class="bf-done-warn" data-done-warn hidden></p>
+
+    <ul class="bf-done-list">
+      <li>Someone who has built this before reads it — not a sales inbox.</li>
+      <li>You'll hear back with something specific, not a generic reply.</li>
+      <li>Anything you left out, we'll cover on the call rather than by email tennis.</li>
+    </ul>
+
+    <details class="bf-done-detail">
+      <summary>
+        See exactly what we received
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <button type="button" class="bf-copy" data-copy>Copy</button>
+      <pre class="bf-done-summary" data-done-summary></pre>
+    </details>
+  </section>
+
+  <noscript>
+    <div class="bf-noscript">
+      <p>
+        This brief needs JavaScript. Email us at <a href={`mailto:${site.email}`}>{site.email}</a>
+        or call <a href={site.voiceAgentPhoneHref}>{site.voiceAgentPhone}</a> and we'll take it from there.
+      </p>
+    </div>
+  </noscript>
+</div>
+
+<style is:global>
+  /* ══ A lighter, solid surface ladder ═══════════════════════
+     The site sits on near-black. Dense forms need lift, so the studio
+     runs one rung brighter throughout: solid fills, hairline borders,
+     no glass. Contrast comes from the steps between surfaces rather
+     than from brightness. */
+  .bf {
+    --s1: #101627;   /* card */
+    --s2: #161d31;   /* control */
+    --s3: #1f2841;   /* hover & selected */
+    --ln: #273052;   /* hairline */
+    --ln2: #36426c;  /* hairline, raised */
+    --acc: #6f66ff;
+    --acc-soft: rgba(111, 102, 255, 0.14);
+    --acc2: #2fd4ee;
+    --txt: #f1f3ff;
+    --dim: #a3abc7;
+    --faint: #737b9c;
+    position: relative;
+  }
+
+  /* Same colour story as the "Ready to build" panel, at a fraction of
+     the intensity — the form reads as the same product, not a new one. */
+  .bf::before {
+    content: "";
+    position: absolute;
+    inset: -6% -4% 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 36px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(40, 96, 255, 0.13), transparent 42%),
+      radial-gradient(circle at 88% 6%, rgba(143, 50, 222, 0.12), transparent 46%);
+  }
+
+  .bf-grid {
+    display: grid;
+    grid-template-columns: 384px minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* ══ Left rail ═════════════════════════════════════════════ */
+  .bf-rail { position: sticky; top: 5.5rem; }
+  .bf-rail-inner { display: grid; gap: 1rem; }
+
+  .bf-consultant {
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    border: 1px solid var(--ln);
+    background: var(--s1);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+    overflow: hidden;
+  }
+
+  .bf-con-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.95rem 1.05rem;
+    border-bottom: 1px solid var(--ln);
+    background: linear-gradient(180deg, rgba(111, 102, 255, 0.09), transparent);
+  }
+  .bf-orb {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #66dcff, #7468ff 55%, #9b5cff);
+    box-shadow: 0 0 0 3px rgba(111, 102, 255, 0.13);
+  }
+  .bf-con-name { color: var(--txt); font-size: 0.88rem; font-weight: 650; letter-spacing: -0.01em; }
+  .bf-con-tag {
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.42rem;
+    border-radius: 999px;
+    border: 1px solid var(--ln2);
+    color: var(--acc2);
+    font-size: 0.57rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .bf-con-status {
+    margin-top: 0.1rem;
+    color: var(--faint);
+    font-size: 0.72rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bf-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-height: 190px;
+    max-height: 34vh;
+    padding: 1rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ln2) transparent;
+    scroll-behavior: smooth;
+  }
+  .bf-msg {
+    max-width: 92%;
+    padding: 0.65rem 0.85rem;
+    border-radius: 13px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    animation: bf-pop 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes bf-pop {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: none; }
+  }
+  .bf-msg-consultant {
+    align-self: flex-start;
+    border: 1px solid var(--ln);
+    border-bottom-left-radius: 4px;
+    background: var(--s2);
+    color: #e4e8ff;
+  }
+  .bf-msg-you {
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    background: var(--acc);
+    color: #fff;
+  }
+  .bf-typing {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 0.75rem 0.85rem;
+    border-radius: 13px;
+    border: 1px solid var(--ln);
+    border-bottom-left-radius: 4px;
+    background: var(--s2);
+  }
+  .bf-typing i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--acc2);
+    animation: bf-blink 1.25s ease-in-out infinite;
+  }
+  .bf-typing i:nth-child(2) { animation-delay: 0.16s; }
+  .bf-typing i:nth-child(3) { animation-delay: 0.32s; }
+  @keyframes bf-blink {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+  }
+
+  .bf-quicks { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0 1rem 0.75rem; }
+  .bf-quicks:empty { display: none; }
+  .bf-quick {
+    padding: 0.4rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 0.74rem;
+    cursor: pointer;
+    transition: border-color 0.18s, color 0.18s, background 0.18s;
+  }
+  .bf-quick:hover { border-color: var(--acc); background: var(--s3); color: var(--txt); }
+
+  .bf-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.35rem;
+    margin: 0 0.85rem 0.85rem;
+    padding: 0.35rem 0.35rem 0.35rem 0.8rem;
+    border-radius: 13px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bf-composer:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); }
+  .bf-composer textarea {
+    flex: 1;
+    min-width: 0;
+    max-height: 120px;
+    padding: 0.45rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--txt);
+    font-family: inherit;
+    font-size: 0.83rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+  }
+  .bf-composer textarea::placeholder { color: rgba(255, 255, 255, 0.26); }
+  .bf-mic, .bf-send-msg {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .bf-mic { border-color: var(--ln2); background: var(--s3); color: var(--dim); }
+  .bf-mic:hover { color: var(--txt); border-color: var(--acc); }
+  .bf-mic.is-live {
+    background: #e0455f;
+    border-color: #e0455f;
+    color: #fff;
+    animation: bf-pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes bf-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(224, 69, 95, 0.5); }
+    50% { box-shadow: 0 0 0 7px rgba(224, 69, 95, 0); }
+  }
+  .bf-send-msg { background: var(--acc); color: #fff; }
+  .bf-send-msg:hover { background: #7d75ff; }
+
+  /* ── Meter ─────────────────────────────────────────────── */
+  .bf-meter-card {
+    padding: 1.1rem;
+    border-radius: 18px;
+    border: 1px solid var(--ln);
+    background: var(--s1);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+  }
+  .bf-meter-top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
+  .bf-meter-label { color: var(--txt); font-size: 0.85rem; font-weight: 650; letter-spacing: -0.01em; }
+  .bf-meter-pct { color: var(--faint); font-size: 0.75rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .bf-meter {
+    height: 6px;
+    margin-top: 0.6rem;
+    border-radius: 999px;
+    background: var(--s3);
+    overflow: hidden;
+  }
+  .bf-meter-fill {
+    display: block;
+    height: 100%;
+    width: 2%;
+    border-radius: 999px;
+    background: var(--ln2);
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1), background 0.5s;
+  }
+  .bf-meter-fill[data-tier="reply"] { background: linear-gradient(90deg, #4b7dff, #6f66ff); }
+  .bf-meter-fill[data-tier="call"] { background: linear-gradient(90deg, #6f66ff, #2fd4ee); }
+  .bf-meter-fill[data-tier="strong"] { background: linear-gradient(90deg, #2fd4ee, #57f0b0); }
+  .bf-meter-note { margin-top: 0.55rem; color: var(--faint); font-size: 0.75rem; line-height: 1.55; }
+
+  .bf-readback {
+    margin-top: 0.9rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+  }
+  .bf-readback-head {
+    color: var(--acc2);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .bf-readback-list { display: grid; gap: 0.3rem; margin-top: 0.5rem; }
+  .bf-readback-list li {
+    color: #d9deff;
+    font-size: 0.765rem;
+    line-height: 1.5;
+    list-style: none;
+  }
+
+  .bf-send {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.85rem 1.2rem;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(120deg, #2860ff, #6f66ff 52%, #8f32de);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(74, 84, 255, 0.28);
+    transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .bf-send:hover:not(:disabled) { filter: saturate(1.15); transform: translateY(-1px); }
+  .bf-send:disabled {
+    background: var(--s3);
+    color: var(--faint);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .bf-send-hint { margin-top: 0.55rem; color: var(--faint); font-size: 0.71rem; line-height: 1.5; text-align: center; }
+
+  /* ══ The brief ═════════════════════════════════════════════ */
+  .bf-main { display: grid; gap: 1.25rem; }
+
+  /* The parts are rendered into this one wrapper, so the gap has to live
+     here too — `.bf-main`'s gap only separates the wrapper as a whole from
+     the booking panel below it, which left Parts 1–5 stacked edge to edge. */
+  .bf-main [data-studio-sections] { display: grid; gap: 1.25rem; }
+
+  .bf-section {
+    padding: 1.9rem 1.9rem 2.1rem;
+    border-radius: 18px;
+    border: 1px solid var(--ln);
+    background: var(--s1);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+    animation: bf-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes bf-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+  /* No rule under the heading — the space and the wash separate it. */
+  .bf-section-head { padding-bottom: 1.5rem; }
+  .bf-eyebrow {
+    color: var(--acc2);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .bf-section-title {
+    margin-top: 0.5rem;
+    color: var(--txt);
+    font-family: var(--font-display);
+    font-size: 1.32rem;
+    font-weight: 640;
+    letter-spacing: -0.018em;
+  }
+  .bf-section-blurb {
+    margin-top: 0.45rem;
+    max-width: 40rem;
+    color: var(--dim);
+    font-size: 0.83rem;
+    line-height: 1.65;
+  }
+
+  .bf-section-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.1rem 1.4rem;
+    margin-top: 1.8rem;
+  }
+  .bf-field { grid-column: 1 / -1; }
+  .bf-half { grid-column: span 1; }
+
+  .bf-field.is-lit { animation: bf-lit 1.6s ease-out; }
+  @keyframes bf-lit {
+    0% { box-shadow: 0 0 0 0 rgba(47, 212, 238, 0); }
+    18% { box-shadow: 0 0 0 6px rgba(47, 212, 238, 0.16); }
+    100% { box-shadow: 0 0 0 0 rgba(47, 212, 238, 0); }
+  }
+
+  .bf-head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  .bf-label { color: var(--txt); font-size: 0.9rem; font-weight: 620; letter-spacing: -0.008em; }
+  .bf-optional {
+    padding: 0.1rem 0.44rem;
+    border-radius: 999px;
+    border: 1px solid var(--ln2);
+    color: var(--faint);
+    font-size: 0.6rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .bf-hint { margin-top: 0.4rem; color: var(--faint); font-size: 0.78rem; line-height: 1.6; }
+
+  .bf-ai {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.14rem 0.5rem 0.14rem 0.42rem;
+    border-radius: 999px;
+    border: 1px solid rgba(47, 212, 238, 0.35);
+    background: rgba(47, 212, 238, 0.09);
+    color: var(--acc2);
+    font-size: 0.63rem;
+    font-weight: 650;
+  }
+  .bf-ai-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--acc2);
+  }
+  .bf-ai-undo {
+    border: 0;
+    background: transparent;
+    color: var(--acc2);
+    font-family: inherit;
+    font-size: 0.63rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+  .bf-ai-undo:hover { color: #fff; }
+
+  /* ── Chips & cards ─────────────────────────────────────── */
+  .bf-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.05rem; }
+  .bf-chip {
+    padding: 0.52rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 0.805rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.16s, background 0.16s, color 0.16s;
+  }
+  .bf-chip:hover { border-color: var(--ln2); background: var(--s3); color: var(--txt); }
+  .bf-chip.is-on {
+    border-color: var(--acc);
+    background: var(--acc-soft);
+    color: #dcdaff;
+    font-weight: 600;
+  }
+  .bf-chip:focus-visible, .bf-card:focus-visible { outline: 2px solid var(--acc2); outline-offset: 2px; }
+  .bf-chip-x {
+    display: inline-grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 0.35rem;
+    margin-right: -0.2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: 0.66rem;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .bf-chip-add { border-style: dashed; color: var(--acc2); }
+  .bf-chip-add:hover { border-style: solid; border-color: var(--acc2); }
+
+  .bf-custom { display: flex; gap: 0.35rem; margin-top: 0.5rem; width: min(100%, 20rem); }
+  .bf-custom input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.52rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--acc);
+    background: var(--s2);
+    color: var(--txt);
+    font-family: inherit;
+    font-size: 0.8rem;
+    outline: none;
+  }
+  .bf-custom button {
+    flex: none;
+    padding: 0 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--acc);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .bf-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 1.05rem;
+  }
+  .bf-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.9rem 0.95rem;
+    border-radius: 13px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .bf-card:hover { border-color: var(--ln2); background: var(--s3); }
+  .bf-card.is-on { border-color: var(--acc); background: var(--acc-soft); }
+  .bf-card-mark {
+    flex: none;
+    position: relative;
+    width: 17px;
+    height: 17px;
+    margin-top: 0.1rem;
+    border-radius: 50%;
+    border: 1px solid var(--ln2);
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .bf-card.is-on .bf-card-mark { border-color: var(--acc); background: var(--acc); }
+  .bf-card.is-on .bf-card-mark::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 10px no-repeat;
+  }
+  .bf-card-body { min-width: 0; }
+  .bf-card-title { display: block; color: var(--txt); font-size: 0.855rem; font-weight: 620; line-height: 1.35; }
+  .bf-card-desc { display: block; margin-top: 0.22rem; color: var(--faint); font-size: 0.745rem; line-height: 1.5; }
+
+  /* ── Text controls ─────────────────────────────────────── */
+  .bf-textwrap { position: relative; margin-top: 1.05rem; }
+  .bf-textarea, .bf-input {
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    border-radius: 12px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    color: var(--txt);
+    font-family: inherit;
+    font-size: 0.855rem;
+    line-height: 1.7;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bf-textarea { resize: vertical; padding-right: 3rem; }
+  .bf-input { margin-top: 1.05rem; }
+  .bf-textarea::placeholder, .bf-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+  .bf-textarea:focus, .bf-input:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); }
+
+  .bf-mic-small {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    border-radius: 8px;
+    border: 1px solid var(--ln2);
+    background: var(--s3);
+    color: var(--faint);
+    cursor: pointer;
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
+  }
+  .bf-mic-small:hover { color: var(--txt); border-color: var(--acc); }
+  .bf-mic-small.is-live {
+    background: #e0455f;
+    border-color: #e0455f;
+    color: #fff;
+    animation: bf-pulse 1.4s ease-in-out infinite;
+  }
+
+  /* ── Booking ───────────────────────────────────────────── */
+  .bf-switch { display: inline-flex; align-items: center; gap: 0.65rem; margin-top: 1.3rem; cursor: pointer; }
+  .bf-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .bf-switch-track {
+    position: relative;
+    width: 40px;
+    height: 23px;
+    border-radius: 999px;
+    border: 1px solid var(--ln2);
+    background: var(--s2);
+    transition: background 0.22s, border-color 0.22s;
+  }
+  .bf-switch-track i {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--faint);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), background 0.22s;
+  }
+  .bf-switch input:checked + .bf-switch-track { background: var(--acc); border-color: var(--acc); }
+  .bf-switch input:checked + .bf-switch-track i { transform: translateX(17px); background: #fff; }
+  .bf-switch input:focus-visible + .bf-switch-track { outline: 2px solid var(--acc2); outline-offset: 2px; }
+  .bf-switch-text { color: var(--txt); font-size: 0.855rem; font-weight: 600; }
+  .bf-book-body { margin-top: 0.5rem; }
+
+  .bf-reassure {
+    padding: 0.2rem 0.4rem 0;
+    color: var(--faint);
+    font-size: 0.775rem;
+    text-align: center;
+  }
+  .bf-reassure a { color: var(--dim); text-decoration: underline; text-underline-offset: 3px; }
+  .bf-reassure a:hover { color: var(--txt); }
+
+  /* ── Confirmation ──────────────────────────────────────── */
+  .bf-done {
+    padding: 2.6rem 1.8rem 2.2rem;
+    border-radius: 20px;
+    border: 1px solid var(--ln);
+    background: var(--s1);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.36);
+    text-align: center;
+  }
+  .bf-done-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 1px solid rgba(47, 212, 238, 0.35);
+    background: rgba(47, 212, 238, 0.1);
+    color: var(--acc2);
+  }
+  .bf-done-title {
+    margin-top: 1.1rem;
+    color: var(--txt);
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 640;
+    letter-spacing: -0.02em;
+  }
+  .bf-done-when { margin-top: 0.5rem; color: var(--acc2); font-size: 0.9rem; font-weight: 600; }
+  .bf-done-warn {
+    max-width: 34rem;
+    margin: 1rem auto 0;
+    padding: 0.7rem 0.9rem;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 157, 180, 0.3);
+    background: rgba(255, 157, 180, 0.08);
+    color: #ffc4d1;
+    font-size: 0.79rem;
+    line-height: 1.6;
+  }
+  .bf-done-list {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 31rem;
+    margin: 1.5rem auto 0;
+    text-align: left;
+  }
+  .bf-done-list li {
+    position: relative;
+    padding-left: 1.15rem;
+    color: var(--dim);
+    font-size: 0.83rem;
+    line-height: 1.65;
+    list-style: none;
+  }
+  .bf-done-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.52rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--acc);
+  }
+  .bf-done-detail {
+    position: relative;
+    max-width: 40rem;
+    margin: 1.7rem auto 0;
+    border-radius: 13px;
+    border: 1px solid var(--ln);
+    background: var(--s2);
+    text-align: left;
+  }
+  .bf-done-detail summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    color: var(--txt);
+    font-size: 0.82rem;
+    font-weight: 620;
+    cursor: pointer;
+    list-style: none;
+  }
+  .bf-done-detail summary::-webkit-details-marker { display: none; }
+  .bf-done-detail[open] summary svg { transform: rotate(180deg); }
+  .bf-done-detail summary svg { color: var(--faint); transition: transform 0.25s ease; }
+  .bf-copy {
+    position: absolute;
+    top: 2.9rem;
+    right: 1rem;
+    z-index: 1;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--ln2);
+    background: var(--s3);
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .bf-done-detail:not([open]) .bf-copy { display: none; }
+  .bf-copy:hover { color: var(--txt); border-color: var(--acc); }
+  .bf-done-summary {
+    max-height: 26rem;
+    margin: 0 1rem 1rem;
+    padding: 0.9rem;
+    border-radius: 10px;
+    background: #0a0f1e;
+    color: #c9d0f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow: auto;
+  }
+
+  .bf-noscript {
+    padding: 1.4rem;
+    border-radius: 16px;
+    border: 1px solid var(--ln);
+    background: var(--s1);
+    color: var(--dim);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    text-align: center;
+  }
+  .bf-noscript a { color: var(--acc2); text-decoration: underline; }
+
+  /* ── The calendar, retuned to the studio's surfaces ─────── */
+  .bf .cal-type, .bf .cal-day.is-free, .bf .cal-slot, .bf .cal-nav {
+    border-color: var(--ln);
+    background: var(--s2);
+  }
+  .bf .cal-type:hover, .bf .cal-day.is-free:hover, .bf .cal-slot:hover, .bf .cal-nav:hover:not(:disabled) {
+    border-color: var(--acc);
+    background: var(--s3);
+  }
+  .bf .cal-type:has(input:checked) { border-color: var(--acc); background: var(--acc-soft); }
+  .bf .cal-day.is-selected, .bf .cal-slot.is-selected {
+    border-color: var(--acc);
+    background: var(--acc);
+    color: #fff;
+  }
+  .bf .cal-tz { border-color: var(--ln); }
+  .bf .cal-types { margin-top: 1.6rem; }
+
+  /* ══ The brief, on paper ═══════════════════════════════════
+     The rail is the assistant and stays dark. The brief is the document
+     you're actually filling in, so it sits on light stock: forty-odd
+     questions are far easier on the eyes in dark-on-light, and the split
+     makes it obvious which half is yours and which half is ours.
+
+     Solid fills throughout — no translucency. Contrast comes from the
+     steps between paper, control and selection, not from brightness. */
+  .bf-main, .bf-done {
+    /* Not white — a periwinkle stock tinted toward the site's violet, so it
+       reads as the same palette rather than a page from another product.
+       Light enough for forty questions, dark enough not to glare beside a
+       near-black page. Controls sit *lighter* than the sheet, so they lift. */
+    --p-card: #e9ecf8;   /* the sheet */
+    --p-ctrl: #f4f6fd;   /* inputs & chips */
+    --p-hover: #dfe4f6;
+    --p-line: #ccd3ea;
+    --p-line2: #b6bfdd;
+    --p-ink: #12172b;    /* headings */
+    --p-body: #414963;   /* body copy */
+    --p-faint: #666e8c;  /* hints */
+    --p-acc: #5b52f0;
+    --p-acc-ink: #3a31bd;
+    --p-acc-soft: #ddd9fc;
+  }
+
+  .bf-main .bf-section, .bf-done {
+    position: relative;
+    border-color: rgba(255, 255, 255, 0.09);
+    background: var(--p-card);
+    box-shadow: 0 20px 50px rgba(2, 6, 24, 0.42);
+  }
+
+  /* A soft violet wash bleeding to the card edges, so each part opens with
+     colour and settles into plain reading below it. */
+  .bf-main .bf-section-head {
+    margin: -1.9rem -1.9rem 0;
+    padding: 1.9rem 1.9rem 1.6rem;
+    background: linear-gradient(180deg, rgba(116, 104, 255, 0.1), rgba(116, 104, 255, 0));
+  }
+  .bf-main .bf-eyebrow { color: var(--p-acc-ink); }
+  .bf-main .bf-section-title { color: var(--p-ink); }
+  .bf-main .bf-section-blurb { color: var(--p-body); }
+
+  .bf-main .bf-label { color: var(--p-ink); }
+  .bf-main .bf-hint { color: var(--p-faint); }
+  .bf-main .bf-optional {
+    border-color: var(--p-line2);
+    background: var(--p-ctrl);
+    color: var(--p-faint);
+  }
+
+  .bf-main .bf-ai {
+    border-color: rgba(91, 82, 240, 0.28);
+    background: var(--p-acc-soft);
+    color: var(--p-acc-ink);
+  }
+  .bf-main .bf-ai-dot { background: var(--p-acc); }
+  .bf-main .bf-ai-undo { color: var(--p-acc-ink); }
+  .bf-main .bf-ai-undo:hover { color: #1b1580; }
+
+  /* ── Chips ─────────────────────────────────────────────── */
+  .bf-main .bf-chip {
+    border-color: var(--p-line2);
+    background: var(--p-ctrl);
+    color: var(--p-body);
+  }
+  .bf-main .bf-chip:hover {
+    border-color: var(--p-acc);
+    background: var(--p-hover);
+    color: var(--p-ink);
+  }
+  .bf-main .bf-chip.is-on {
+    border-color: var(--p-acc);
+    background: var(--p-acc-soft);
+    color: var(--p-acc-ink);
+  }
+  .bf-main .bf-chip-x { background: rgba(64, 56, 201, 0.16); }
+  .bf-main .bf-chip-add { border-color: var(--p-line2); color: var(--p-acc-ink); }
+  .bf-main .bf-chip-add:hover { border-color: var(--p-acc); }
+
+  .bf-main .bf-custom input {
+    border-color: var(--p-acc);
+    background: var(--p-ctrl);
+    color: var(--p-ink);
+  }
+  .bf-main .bf-custom input::placeholder { color: var(--p-faint); }
+  .bf-main .bf-custom button { background: var(--p-acc); }
+
+  /* ── Cards ─────────────────────────────────────────────── */
+  .bf-main .bf-card {
+    border-color: var(--p-line2);
+    background: var(--p-ctrl);
+  }
+  .bf-main .bf-card:hover { border-color: var(--p-acc); background: var(--p-hover); }
+  .bf-main .bf-card.is-on { border-color: var(--p-acc); background: var(--p-acc-soft); }
+  .bf-main .bf-card-mark { border-color: var(--p-line2); }
+  .bf-main .bf-card.is-on .bf-card-mark { border-color: var(--p-acc); background: var(--p-acc); }
+  .bf-main .bf-card-title { color: var(--p-ink); }
+  .bf-main .bf-card-desc { color: var(--p-faint); }
+
+  /* ── Text controls ─────────────────────────────────────── */
+  .bf-main .bf-textarea, .bf-main .bf-input {
+    border-color: var(--p-line2);
+    background: var(--p-ctrl);
+    color: var(--p-ink);
+  }
+  .bf-main .bf-textarea::placeholder, .bf-main .bf-input::placeholder { color: #9aa2ba; }
+  .bf-main .bf-textarea:focus, .bf-main .bf-input:focus {
+    border-color: var(--p-acc);
+    box-shadow: 0 0 0 3px rgba(91, 82, 240, 0.16);
+  }
+  .bf-main .bf-mic-small {
+    border-color: var(--p-line2);
+    background: var(--p-hover);
+    color: var(--p-faint);
+  }
+  .bf-main .bf-mic-small:hover { border-color: var(--p-acc); color: var(--p-acc-ink); }
+  .bf-main .bf-mic-small.is-live { background: #e0455f; border-color: #e0455f; color: #fff; }
+
+  .bf-main .bf-field.is-lit { animation: bf-lit-light 1.6s ease-out; }
+  @keyframes bf-lit-light {
+    0% { box-shadow: 0 0 0 0 rgba(91, 82, 240, 0); }
+    18% { box-shadow: 0 0 0 6px rgba(91, 82, 240, 0.16); }
+    100% { box-shadow: 0 0 0 0 rgba(91, 82, 240, 0); }
+  }
+
+  /* ── Booking switch ────────────────────────────────────── */
+  .bf-main .bf-switch-track { border-color: var(--p-line2); background: var(--p-ctrl); }
+  .bf-main .bf-switch-track i { background: var(--p-line2); }
+  .bf-main .bf-switch input:checked + .bf-switch-track { background: var(--p-acc); border-color: var(--p-acc); }
+  .bf-main .bf-switch-text { color: var(--p-ink); }
+
+  .bf-reassure { color: var(--color-fg-dim); }
+
+  /* ── The calendar on light stock ───────────────────────── */
+  .bf-main .cal-type, .bf-main .cal-slot, .bf-main .cal-nav, .bf-main .cal-day.is-free {
+    border-color: var(--p-line2);
+    background: var(--p-ctrl);
+    color: var(--p-body);
+  }
+  .bf-main .cal-type:hover, .bf-main .cal-slot:hover,
+  .bf-main .cal-nav:hover:not(:disabled), .bf-main .cal-day.is-free:hover {
+    border-color: var(--p-acc);
+    background: var(--p-hover);
+    color: var(--p-ink);
+  }
+  .bf-main .cal-type:has(input:checked) { border-color: var(--p-acc); background: var(--p-acc-soft); }
+  .bf-main .cal-type-label { color: var(--p-ink); }
+  .bf-main .cal-type-mins { border-color: var(--p-line2); color: var(--p-faint); }
+  .bf-main .cal-type-desc { color: var(--p-faint); }
+  .bf-main .cal-type-rec { background: var(--p-acc); color: #fff; }
+  .bf-main .cal-month { color: var(--p-ink); }
+  .bf-main .cal-dow { color: var(--p-faint); }
+  .bf-main .cal-day { color: var(--p-body); }
+  .bf-main .cal-day:disabled { color: var(--p-faint); opacity: 0.4; }
+  .bf-main .cal-day.is-today { box-shadow: inset 0 0 0 1px var(--p-line2); }
+  .bf-main .cal-day.is-free::after { background: var(--p-acc); }
+  .bf-main .cal-day.is-selected, .bf-main .cal-slot.is-selected {
+    border-color: var(--p-acc);
+    background: var(--p-acc);
+    color: #fff;
+  }
+  .bf-main .cal-day.is-selected::after { background: #fff; }
+  .bf-main .cal-tz { border-top-color: var(--p-line); color: var(--p-faint); }
+  .bf-main .cal-tz select { color: var(--p-body); }
+  .bf-main .cal-tz select option { background: var(--p-ctrl); color: var(--p-ink); }
+  .bf-main .cal-slots-head { color: var(--p-ink); }
+  .bf-main .cal-slots-sub { color: var(--p-faint); }
+  .bf-main .cal-empty { color: var(--p-faint); }
+
+  /* ── Confirmation, same stock ──────────────────────────── */
+  .bf-done-icon {
+    border-color: rgba(91, 82, 240, 0.3);
+    background: var(--p-acc-soft);
+    color: var(--p-acc-ink);
+  }
+  .bf-done-title { color: var(--p-ink); }
+  .bf-done-when { color: var(--p-acc-ink); }
+  .bf-done-warn {
+    border-color: #f3c2cd;
+    background: #fdeef1;
+    color: #a02440;
+  }
+  .bf-done-list li { color: var(--p-body); }
+  .bf-done-list li::before { background: var(--p-acc); }
+  .bf-done-detail { border-color: var(--p-line2); background: var(--p-ctrl); }
+  .bf-done-detail summary { color: var(--p-ink); }
+  .bf-done-detail summary svg { color: var(--p-faint); }
+  .bf-copy {
+    border-color: var(--p-line2);
+    background: var(--p-hover);
+    color: var(--p-body);
+  }
+  .bf-copy:hover { border-color: var(--p-acc); color: var(--p-acc-ink); }
+  .bf-done-summary {
+    background: #dfe4f6;
+    color: #2a3150;
+  }
+
+  /* ══ Responsive ════════════════════════════════════════════ */
+  @media (max-width: 1080px) {
+    .bf-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .bf-rail { position: static; }
+    .bf-thread { max-height: 46vh; }
+    /* The rail becomes a bar pinned to the bottom: the meter and the way
+       out stay reachable without scrolling back up. */
+    .bf-meter-card {
+      position: sticky;
+      bottom: 0.6rem;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(16, 22, 39, 0.93);
+    }
+    .bf-readback { display: none; }
+  }
+  @media (max-width: 700px) {
+    .bf-section { padding: 1.5rem 1.25rem 1.7rem; }
+    /* The head bleeds to the card edge, so its negative margin has to track
+       the card's padding or the wash hangs off the side. */
+    .bf-main .bf-section-head { margin: -1.5rem -1.25rem 0; padding: 1.5rem 1.25rem 1.3rem; }
+    .bf-section-body { grid-template-columns: 1fr; gap: 1.8rem; }
+    .bf-half { grid-column: 1 / -1; }
+    .bf-cards { grid-template-columns: 1fr; }
+    .bf-done { padding: 2rem 1.1rem 1.7rem; }
+    .bf-copy { top: 2.7rem; right: 0.7rem; }
+  }
+</style>
+
+<script>
+  import { mountStudio } from "../../lib/studio";
+  import { site } from "../../data/site";
+
+  const root = document.querySelector<HTMLElement>("[data-studio]");
+  if (root) {
+    mountStudio(root, { endpoint: site.briefEndpoint, email: site.email });
+  }
+</script>

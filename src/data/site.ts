@@ -19,6 +19,18 @@ export const site = {
   // ⚠️ PLACEHOLDER - contact email
   email: "hello@insertai.com",
 
+  /**
+   * Where a completed project brief is POSTed as JSON.
+   *
+   * Point this at anything that accepts a webhook — Zapier, Make, n8n,
+   * a CRM endpoint, or your own function. The body is the structured
+   * brief plus a ready-to-read `markdown` field; see lib/brief-export.ts.
+   *
+   * Leave it empty and nothing is sent: the visitor still gets the
+   * confirmation and a copyable brief, which is the current behaviour.
+   */
+  briefEndpoint: "",
+
   social: {
     linkedin: "https://www.linkedin.com/company/insertai",
     x: "https://x.com/insertai",

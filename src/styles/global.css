@@ -19,6 +19,14 @@
   --color-acc: #675cff;
   --color-acc-2: #1ed6ff;
   --color-acc-3: #b45cff;
+
+  /* Solid surfaces for dense UI (forms, calendar). Glass panels read well over
+     a hero image but get muddy behind 20 form controls — these stay opaque. */
+  --color-surface: #0a0e1c;
+  --color-surface-2: #121828;
+  --color-surface-3: #1a2138;
+  --color-edge: #242c46;
+  --color-edge-2: #333c5c;
 }
 
 html {

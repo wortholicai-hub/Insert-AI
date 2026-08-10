@@ -140,6 +140,7 @@ const jsonLd = {
       const candidates = document.querySelectorAll("main h1, main h2, main h3, main p, main .mono, main blockquote, main figcaption, main span.accent, main .display, main img, main article, main .soft-card, main .spec-media, main .int-hub, main section > .site-shell > .grid, main section > .site-shell > .reveal");
       const blurEls = [];
       for (const el of candidates) {
+        if (el.closest("[data-no-blur]")) continue;
         if (el.closest("#top")) continue;
         if (el.closest("[data-hs-section]")) continue;
         if (el.closest(".marquee")) continue;
