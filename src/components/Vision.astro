@@ -1,5 +1,6 @@
 ---
 import { site } from "../data/site";
+import VisionOrb from "./VisionOrb.astro";
 ---
 
 <section id="vision" class="py-5">
@@ -24,25 +25,10 @@ import { site } from "../data/site";
         </div>
       </div>
 
-      <!-- full-image card -->
+      <!-- orb, sitting straight on the section background - no card -->
       <div class="reveal relative lg:order-1">
-        <!-- ambient glow bleeding behind the card -->
-        <div class="pointer-events-none absolute -inset-6 -z-10 bg-[radial-gradient(circle_at_62%_38%,rgba(46,214,255,.24),transparent_62%),radial-gradient(circle_at_36%_74%,rgba(103,92,255,.22),transparent_60%)] blur-2xl"></div>
-
-        <div class="relative h-full min-h-[340px] overflow-hidden rounded-[26px] border border-white/12 shadow-2xl shadow-black/55 sm:min-h-[420px] lg:min-h-[520px]">
-          <img
-            src="/assets/generated/astronaut.webp"
-            alt="Cybernetic astronaut gazing into deep space - human ambition meets machine intelligence"
-            width="1254"
-            height="1254"
-            loading="lazy"
-            decoding="async"
-            class="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          <!-- bottom depth gradient -->
-          <div class="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/45 via-black/10 to-transparent"></div>
-          <!-- inner sheen ring -->
-          <div class="pointer-events-none absolute inset-0 rounded-[26px] ring-1 ring-inset ring-white/10"></div>
+        <div class="relative h-full min-h-[340px] sm:min-h-[420px] lg:min-h-[520px]">
+          <VisionOrb text="INSERT AI" />
         </div>
       </div>
     </div>
