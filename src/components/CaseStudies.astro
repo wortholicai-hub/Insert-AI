@@ -423,10 +423,22 @@ const asMedia = (m) =>
       border-color 0.2s ease;
   }
   .spec-cta svg { width: 13px; height: 13px; }
-  .spec-frame.is-visible + .spec-cta {
+  /* Hover-revealed, like .spec-nav. The screenshots are marketing art with
+     their own titles baked into the lower-left, so a permanently visible badge
+     sits on top of the artwork's own headline. Hovering is also what pauses the
+     slideshow, so the badge appears exactly when it is clickable. */
+  .spec-media:hover .spec-frame.is-visible + .spec-cta {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
+  }
+  /* touch devices never hover, so there the badge is simply always shown */
+  @media (hover: none) {
+    .spec-frame.is-visible + .spec-cta {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
   }
   .spec-cta:hover {
     background: linear-gradient(135deg, #725eff, #4e73ff);
