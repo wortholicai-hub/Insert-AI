@@ -24,6 +24,13 @@ const reviews = [
 ];
 
 const initials = (name) => name.split(" ").map((p) => p[0]).slice(0, 2).join("");
+
+// The list is rendered twice. The animation travels exactly one list-width and
+// then repeats, so the second copy is what occupies the right-hand side at the
+// moment the transform snaps back - that is what makes the loop seamless
+// rather than visibly jumping. The copy is aria-hidden so screen readers and
+// search engines see each quote once.
+const marquee = [...reviews, ...reviews];
 ---
 
 <section id="reviews" class="py-5">
@@ -35,68 +42,76 @@ const initials = (name) => name.split(" ").map((p) => p[0]).slice(0, 2).join("")
       </h2>
     </div>
 
-    <!--
-      A wall, not a carousel. This used to be a max-w-3xl one-at-a-time slider,
-      which sat at less than half the width of the booking panel directly above
-      it and made the whole foot of the page look misaligned. Showing every
-      quote at once also means five proof points land instead of one, and there
-      is no auto-advancing timer racing the reader.
-    -->
-    <div class="rv mx-auto max-w-[86rem]">
-      {reviews.map((r) => (
-        <figure class="rv-card">
-          <p class="rv-stars" aria-label="Rated 5 out of 5">★★★★★</p>
-          <blockquote class="rv-quote">{r.quote}</blockquote>
-          <figcaption class="rv-by">
-            {r.avatar ? (
-              <img src={r.avatar} alt="" width="38" height="38" loading="lazy" decoding="async" class="rv-face" />
-            ) : (
-              <span class="rv-face rv-initials">{initials(r.name)}</span>
-            )}
-            <div>
-              <p class="rv-name">{r.name}</p>
-              <p class="rv-role">{r.role}</p>
-            </div>
-          </figcaption>
-        </figure>
-      ))}
+    <div class="rv-marquee mx-auto max-w-[86rem]">
+      <div class="rv-track">
+        {marquee.map((r, i) => (
+          <figure class="rv-card" aria-hidden={i >= reviews.length ? "true" : undefined}>
+            <p class="rv-stars" aria-label="Rated 5 out of 5">★★★★★</p>
+            <blockquote class="rv-quote">{r.quote}</blockquote>
+            <figcaption class="rv-by">
+              {r.avatar ? (
+                <img src={r.avatar} alt="" width="38" height="38" loading="lazy" decoding="async" class="rv-face" />
+              ) : (
+                <span class="rv-face rv-initials">{initials(r.name)}</span>
+              )}
+              <div>
+                <p class="rv-name">{r.name}</p>
+                <p class="rv-role">{r.role}</p>
+              </div>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* Multi-column rather than grid: the quotes differ in length, and columns
-     let each card keep its natural height instead of every card in a row
-     stretching to match the tallest one. */
-  .rv {
-    columns: 3;
-    column-gap: 1.3rem;
+  .rv-marquee {
+    overflow: hidden;
+    /* without the fade, cards are guillotined at the container edge, which
+       reads as a clipping bug rather than as motion continuing off-screen */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+
+  .rv-track {
+    display: flex;
+    gap: 1.3rem;
+    width: max-content;
+    animation: rv-scroll 52s linear infinite;
+  }
+  /* let someone stop a quote they are halfway through reading */
+  .rv-marquee:hover .rv-track { animation-play-state: paused; }
+
+  /* The track is 10 cards and 9 gaps, so one list-width is not -50% - that
+     would be 5 cards and 4.5 gaps. The extra half-gap is the correction. */
+  @keyframes rv-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-50% - 0.65rem)); }
   }
 
   .rv-card {
-    /* without this a card can be split across a column boundary */
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    margin-bottom: 1.3rem;
+    flex: 0 0 22rem;
+    display: flex;
+    flex-direction: column;
     padding: 1.55rem 1.5rem 1.4rem;
     border-radius: 16px;
     border: 1px solid var(--color-line-strong);
     background: linear-gradient(150deg, rgba(19, 25, 50, 0.78), rgba(8, 11, 24, 0.82));
-    transition: border-color 0.25s ease, transform 0.25s ease;
+    transition: border-color 0.25s ease;
   }
-  .rv-card:hover {
-    border-color: rgba(46, 214, 255, 0.42);
-    transform: translateY(-2px);
-  }
+  .rv-card:hover { border-color: rgba(46, 214, 255, 0.42); }
 
   .rv-stars {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
+    font-size: 1.05rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
     color: #ffc24a;
   }
 
   .rv-quote {
-    margin-top: 0.85rem;
+    margin-top: 0.95rem;
     font-size: 0.95rem;
     line-height: 1.72;
     color: rgba(255, 255, 255, 0.88);
@@ -106,7 +121,9 @@ const initials = (name) => name.split(" ").map((p) => p[0]).slice(0, 2).join("")
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    margin-top: 1.2rem;
+    /* pins the byline to the bottom, so it lines up across cards of differing
+       quote length instead of floating mid-card */
+    margin-top: auto;
     padding-top: 1.1rem;
     border-top: 1px solid var(--color-edge);
   }
@@ -128,6 +145,14 @@ const initials = (name) => name.split(" ").map((p) => p[0]).slice(0, 2).join("")
   .rv-name { font-size: 0.83rem; font-weight: 600; color: #fff; }
   .rv-role { margin-top: 0.1rem; font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); }
 
-  @media (max-width: 1100px) { .rv { columns: 2; } }
-  @media (max-width: 680px) { .rv { columns: 1; } }
+  @media (max-width: 560px) {
+    .rv-card { flex-basis: 18rem; }
+  }
+
+  /* drifting text is a vestibular trigger - hand the row over as something
+     the visitor scrolls themselves */
+  @media (prefers-reduced-motion: reduce) {
+    .rv-track { animation: none; }
+    .rv-marquee { overflow-x: auto; scrollbar-width: thin; scrollbar-color: #7d5cff transparent; }
+  }
 </style>
