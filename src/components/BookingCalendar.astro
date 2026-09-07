@@ -33,7 +33,7 @@ import { site } from "../data/site";
       </li>
       <li>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
-        <span data-bk-tz>Your local time</span>
+        <span>Eastern Time (US &amp; Canada)</span>
       </li>
     </ul>
   </aside>
@@ -320,7 +320,6 @@ import { site } from "../data/site";
     const gridEl = el.querySelector("[data-bk-grid]") as HTMLElement;
     const slotsEl = el.querySelector("[data-bk-slots]") as HTMLElement;
     const dayEl = el.querySelector("[data-bk-day]") as HTMLElement;
-    const tzEl = el.querySelector("[data-bk-tz]") as HTMLElement;
     const confirmEl = el.querySelector("[data-bk-confirm]") as HTMLAnchorElement;
     const prevBtn = el.querySelector("[data-bk-prev]") as HTMLButtonElement;
     const nextBtn = el.querySelector("[data-bk-next]") as HTMLButtonElement;
@@ -344,6 +343,9 @@ import { site } from "../data/site";
     };
 
     // ── MOCK AVAILABILITY - replace these two with a real free-busy call ──
+    // Slot labels are Eastern Time wall-clock (9:00am-4:30pm ET), which is what
+    // the info pane advertises. They are not converted to the visitor's zone,
+    // so if this ever renders in local time the pane's label must change too.
     const isOpen = (d: Date) => {
       if (d < today) return false;
       const dow = d.getDay();
@@ -373,11 +375,6 @@ import { site } from "../data/site";
 
     const monthFmt = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
     const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "short", day: "numeric" });
-
-    if (tzEl) {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (tz) tzEl.textContent = tz.replace(/_/g, " ");
-    }
 
     const syncConfirm = () => {
       const ready = Boolean(selected && slot);
