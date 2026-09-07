@@ -481,30 +481,39 @@ const asMedia = (m) =>
      and these screenshots put their own titles in the lower left. */
   .spec-cta {
     position: absolute;
-    right: 14px;
-    bottom: 12px;
+    right: 16px;
+    bottom: 16px;
     z-index: 4;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.48rem 0.85rem;
+    gap: 0.45rem;
+    padding: 0.72rem 1.25rem;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    background: rgba(6, 8, 18, 0.72);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    /* the site's primary button fill - a translucent pill read as a caption
+       rather than something to press */
+    background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
+    box-shadow: 0 10px 26px rgba(85, 94, 255, 0.42);
     color: #fff;
-    font-size: 0.76rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    white-space: nowrap;
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, filter 0.2s ease;
   }
-  .spec-cta svg { width: 12px; height: 12px; opacity: 0.8; }
-  /* hovering anywhere on the screenshot lights the pill, since the whole
-     screenshot is what is clickable */
+  .spec-cta svg { width: 14px; height: 14px; }
+  /* the whole screenshot is the link, so hovering anywhere on it lifts the
+     button - that is what signals the image is clickable */
   .spec-frame.is-link:hover .spec-cta {
-    background: linear-gradient(135deg, #725eff, #4e73ff);
-    border-color: transparent;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 14px 32px rgba(85, 94, 255, 0.55);
+  }
+
+  @media (max-width: 560px) {
+    .spec-cta { right: 10px; bottom: 10px; padding: 0.58rem 0.95rem; font-size: 0.78rem; }
   }
   .spec-cta:hover {
     background: linear-gradient(135deg, #725eff, #4e73ff);
