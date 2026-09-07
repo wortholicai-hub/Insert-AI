@@ -19,7 +19,7 @@ import { site } from "../data/site";
   <!-- ── what you're booking ─────────────────────────────── -->
   <aside class="bk-info">
     <img src="/assets/agency-logo/insert ai logo svg black bk.svg" alt="InsertAI" width="150" height="75" class="bk-logo" />
-    <p class="bk-kicker">Strategy call</p>
+    <p class="bk-kicker">Architecture review</p>
     <h3 class="bk-title">Talk to an engineer</h3>
 
     <ul class="bk-meta">
@@ -87,7 +87,11 @@ import { site } from "../data/site";
     border-right: 1px solid var(--color-edge);
     background: rgba(255, 255, 255, 0.015);
   }
-  .bk-logo { height: 62px; width: auto; margin: -14px 0 0 -6px; }
+  /* 100px to match the nav mark. The source SVG carries a lot of internal
+     padding, so like the nav (-my-9) the negative margins claw back the empty
+     box around the artwork - without them the logo pushes the kicker down and
+     the pane looks top-heavy. Scaled from the old 62px values. */
+  .bk-logo { height: 100px; width: auto; margin: -23px 0 -12px -10px; }
   .bk-kicker {
     margin-top: 0.2rem;
     font-family: var(--font-mono, monospace);
