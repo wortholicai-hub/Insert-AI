@@ -4,64 +4,62 @@ const year = 2023;
 ---
 
 <footer class="pb-10 pt-6" data-footer>
-  <!-- Watermark: a dull wordmark across the whole footer, with a torch that
-       follows the cursor and brings it up to full strength underneath. -->
-  <div class="ft-mark" aria-hidden="true">
-    <span class="ft-mark-dull"></span>
-    <span class="ft-mark-lit"></span>
-  </div>
+  <div class="site-shell">
+    <div class="ft-top grid gap-x-10 gap-y-12 border-t border-white/10 pt-10 lg:grid-cols-[1.15fr_1fr]">
+      <!-- ── links, left ── -->
+      <nav class="ft-links grid gap-10 sm:grid-cols-3" aria-label="Footer">
+        <div>
+          <p class="ft-head">Services</p>
+          <ul class="space-y-3 text-sm text-white/58">
+            <li><a class="link-sweep hover:text-white" href="#services">AI Agents & Voice AI</a></li>
+            <li><a class="link-sweep hover:text-white" href="#services">Custom Software & SaaS</a></li>
+            <li><a class="link-sweep hover:text-white" href="#services">Automation & CRM</a></li>
+            <li><a class="link-sweep hover:text-white" href="#services">RAG & Knowledge Systems</a></li>
+          </ul>
+        </div>
 
-  <div class="site-shell relative z-10">
-    <div class="grid gap-10 border-t border-white/10 pt-8 md:grid-cols-[1.7fr_1fr_1fr_1fr]">
-      <div>
-        <a href="#top" class="flex items-center text-white" aria-label={site.name}>
-          <img src="/assets/agency-logo/insert ai logo svg black bk.svg" alt={`${site.name} logo`} width="200" height="100" class="h-[100px] w-auto -my-9" />
+        <div>
+          <p class="ft-head">Company</p>
+          <ul class="space-y-3 text-sm text-white/58">
+            <li><a class="link-sweep hover:text-white" href="#process">About Us</a></li>
+            <li><a class="link-sweep hover:text-white" href={`mailto:${site.email}`}>Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="ft-head">Resources</p>
+          <ul class="space-y-3 text-sm text-white/58">
+            <li><a class="link-sweep hover:text-white" href="#case-studies">Capabilities</a></li>
+            <li><button class="link-sweep hover:text-white cursor-pointer" type="button" data-legal="guides">Guides</button></li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- ── mark, right ── -->
+      <div class="ft-brand">
+        <!-- The wordmark sits dull and lifts to full strength inside a circle
+             that follows the cursor. Two stacked layers of one image, the upper
+             one masked, so it reads as the same letters brightening. -->
+        <a href="#top" class="ft-logo" aria-label={site.name} data-footer-mark-area>
+          <span class="ft-mark-dull" aria-hidden="true"></span>
+          <span class="ft-mark-lit" aria-hidden="true"></span>
         </a>
-        <p class="mt-5 max-w-xs text-sm leading-6 text-white/55">
-          We insert AI into your business and build the software that makes it real. Custom AI, automation, and software engineering for companies at every stage.
-        </p>
-        <div class="mt-5 flex gap-2">
-          <a href="https://www.linkedin.com/company/insert-artificial-intelligence/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
+
+        <div class="ft-social">
+          <a href="https://www.linkedin.com/company/insert-artificial-intelligence/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           </a>
-          <a href="#" aria-label="X (Twitter)" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
+          <a href="#" aria-label="X (Twitter)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
-          <a href="#" aria-label="Instagram" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
+          <a href="#" aria-label="Instagram">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </a>
-          <a href="#" aria-label="Facebook" class="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 transition hover:border-white/30 hover:text-white">
+          <a href="#" aria-label="Facebook">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           </a>
         </div>
       </div>
-
-      <div>
-        <p class="mono mb-4 text-white">Services</p>
-        <ul class="space-y-3 text-sm text-white/58">
-          <li><a class="link-sweep hover:text-white" href="#services">AI Agents & Voice AI</a></li>
-          <li><a class="link-sweep hover:text-white" href="#services">Custom Software & SaaS</a></li>
-          <li><a class="link-sweep hover:text-white" href="#services">Automation & CRM</a></li>
-          <li><a class="link-sweep hover:text-white" href="#services">RAG & Knowledge Systems</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <p class="mono mb-4 text-white">Company</p>
-        <ul class="space-y-3 text-sm text-white/58">
-          <li><a class="link-sweep hover:text-white" href="#process">About Us</a></li>
-          <li><a class="link-sweep hover:text-white" href={`mailto:${site.email}`}>Contact</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <p class="mono mb-4 text-white">Resources</p>
-        <ul class="space-y-3 text-sm text-white/58">
-          <li><a class="link-sweep hover:text-white" href="#case-studies">Capabilities</a></li>
-          <li><button class="link-sweep hover:text-white cursor-pointer" type="button" data-legal="guides">Guides</button></li>
-        </ul>
-      </div>
-
     </div>
 
     <div class="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-white/36 sm:flex-row sm:items-center sm:justify-between">
@@ -86,49 +84,105 @@ const year = 2023;
 </div>
 
 <style>
-  /* ── hover-revealed wordmark ── */
-  footer { position: relative; overflow: hidden; }
+  /* ── column headings ── */
+  .ft-head {
+    margin-bottom: 1.1rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  /* a short brand rule under each heading, so the three columns read as a set */
+  .ft-head::after {
+    content: "";
+    display: block;
+    width: 26px;
+    height: 2px;
+    margin-top: 0.6rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-acc), #9b5cff);
+  }
 
-  .ft-mark {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    /* the torch is driven by pointer events on the footer itself, so the mark
-       must never intercept them */
-    pointer-events: none;
+  /* ── mark, right ── */
+  .ft-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.4rem;
+  }
+
+  /* aspect-ratio rather than a fixed height: the artwork is a square whose
+     lettering is a band about 22% of its height, so at 100% width the ink is
+     0.22w tall. A 100:30 box leaves that centred with a little air above and
+     below at any column width, and never crops the letters. */
+  .ft-logo {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 26rem;
+    aspect-ratio: 100 / 30;
+    overflow: hidden;
   }
   /* Both layers are the same image at the same size, so the lit one lands
      exactly on top of the dull one and the torch reads as the same letters
      brightening rather than a second mark sliding in.
 
-     The file is a square whose wordmark sits in a band across the middle, so
-     sizing by width overflows the footer vertically on purpose: the empty top
-     and bottom of the artwork are cropped away by the footer's overflow and
-     only the lettering is left. */
-  .ft-mark span {
+     Sized to the box width, so the lettering spans the mark edge to edge and
+     the artwork's empty top and bottom fall outside the box and are simply not
+     painted. */
+  .ft-logo span {
     position: absolute;
     inset: 0;
     background-image: url("/assets/agency-logo/insert ai logo svg black bk.svg");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 105% auto;
+    background-size: 100% auto;
   }
-  .ft-mark-dull { opacity: 0.05; }
+  /* present but quiet - readable as a mark without competing with the links */
+  .ft-mark-dull { opacity: 0.16; }
 
   .ft-mark-lit {
     opacity: 0;
     transition: opacity 0.4s ease;
     /* a soft-edged hole punched at the cursor - a hard circle would look like a
        magnifying glass being dragged around */
-    -webkit-mask-image: radial-gradient(circle 220px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.5) 46%, transparent 72%);
-    mask-image: radial-gradient(circle 220px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.5) 46%, transparent 72%);
+    -webkit-mask-image: radial-gradient(circle 170px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 72%);
+    mask-image: radial-gradient(circle 170px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 72%);
   }
-  footer.is-lit .ft-mark-lit { opacity: 0.34; }
+  footer.is-lit .ft-mark-lit { opacity: 0.92; }
+
+  /* ── social ── */
+  .ft-social { display: flex; gap: 0.5rem; }
+  .ft-social a {
+    display: grid;
+    place-items: center;
+    height: 34px;
+    width: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  }
+  .ft-social a:hover {
+    border-color: rgba(114, 94, 255, 0.6);
+    background: rgba(114, 94, 255, 0.1);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* stacked: the mark leads the block instead of trailing the links */
+  @media (max-width: 1023px) {
+    .ft-brand { align-items: flex-start; }
+    .ft-logo { max-width: 21rem; }
+  }
 
   /* Touch has no cursor to follow, so the torch would either never fire or
      stick wherever the last tap landed. The dull mark still shows. */
   @media (hover: none) {
     .ft-mark-lit { display: none; }
+    .ft-mark-dull { opacity: 0.3; }
   }
   @media (prefers-reduced-motion: reduce) {
     .ft-mark-lit { transition: none; }
@@ -704,7 +758,8 @@ const year = 2023;
   // radial-gradient's position resolves against.
   (function () {
     const foot = document.querySelector('[data-footer]') as HTMLElement | null;
-    if (!foot) return;
+    const area = foot?.querySelector('[data-footer-mark-area]') as HTMLElement | null;
+    if (!foot || !area) return;
     // pointer-driven only - on touch there is nothing to follow
     if (!window.matchMedia('(hover: hover)').matches) return;
 
@@ -715,12 +770,15 @@ const year = 2023;
     // the mask repaints on every var change, so coalesce moves onto a frame
     const apply = () => {
       queued = false;
-      foot.style.setProperty('--fx', x + 'px');
-      foot.style.setProperty('--fy', y + 'px');
+      area.style.setProperty('--fx', x + 'px');
+      area.style.setProperty('--fy', y + 'px');
     };
 
+    // Listening on the whole footer but measuring against the mark's own row:
+    // the torch keeps tracking while the cursor is over the bottom bar, where
+    // the offsets simply resolve outside the row and the circle slides off.
     foot.addEventListener('pointermove', (e) => {
-      const r = foot.getBoundingClientRect();
+      const r = area.getBoundingClientRect();
       x = e.clientX - r.left;
       y = e.clientY - r.top;
       if (!foot.classList.contains('is-lit')) foot.classList.add('is-lit');
