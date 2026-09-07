@@ -65,12 +65,28 @@ const paths = wires.map((w) => roundedPath(w, 22));
 // Two waves per cycle: the upper three fire, then the lower three.
 const delayFor = (i) => (i < 3 ? 0 : 4.5);
 
-const groupNodes = logoGroups.map((g, i) => ({
-  label: g.label,
-  icons: g.items.map((it) => colorFor(it.slug)).filter(Boolean).slice(0, 3),
-  more: Math.max(0, g.items.length - 3),
-  ...positions[i],
-}));
+// Popup placement per ring position. The top row opens downwards and the
+// bottom row upwards so the panel always unfolds towards the middle of the
+// hub; side cards anchor to their outer edge so a ~300px panel cannot push
+// past the container.
+const popSides = ["down-center", "down-right", "down-left", "up-right", "up-left", "up-center"];
+
+// filter(Boolean) is the no-placeholder guarantee: a tool whose SVG is missing
+// from logos-color drops out of both the card and the popup entirely, rather
+// than rendering an empty box or a generic glyph.
+const groupNodes = logoGroups.map((g, i) => {
+  const all = g.items
+    .map((it) => ({ name: it.name, src: colorFor(it.slug) }))
+    .filter((it) => it.src);
+  return {
+    label: g.label,
+    all,
+    icons: all.slice(0, 3),
+    more: Math.max(0, all.length - 3),
+    side: popSides[i],
+    ...positions[i],
+  };
+});
 ---
 
 <section id="integrations" class="py-5">
@@ -85,8 +101,12 @@ const groupNodes = logoGroups.map((g, i) => ({
       </p>
     </div>
 
-    <div class="int-hub" aria-hidden="true">
-      <svg class="int-hub-wires" viewBox="0 0 900 720" fill="none">
+    <!-- the hub used to be aria-hidden wholesale; now that the cards expose a
+         real tool list on hover/focus it carries content, and a focusable
+         popup trigger inside an aria-hidden subtree is invalid. The purely
+         decorative wires keep their own aria-hidden instead. -->
+    <div class="int-hub">
+      <svg class="int-hub-wires" viewBox="0 0 900 720" fill="none" aria-hidden="true">
         <defs>
           <!-- userSpaceOnUse, not the default objectBoundingBox: a perfectly
                vertical path has a zero-width bounding box, which collapses an
@@ -115,13 +135,26 @@ const groupNodes = logoGroups.map((g, i) => ({
       </div>
 
       {groupNodes.map((n, i) => (
-        <div class="grp-node" style={`left:${n.left}%;top:${n.top}%;animation-delay:${i * 0.4}s`}>
-          <span class="grp-glow" style={`animation-delay:${i === 5 ? 0 : (i < 2 ? 0 : 7)}s`}></span>
-          <div class="grp-icons">
-            {n.icons.map((u) => <img src={u} alt="" width="28" height="26" loading="lazy" decoding="async" />)}
-            {n.more > 0 && <span class="grp-more">+{n.more}</span>}
+        <div class={`grp-slot pop-${n.side}`} style={`left:${n.left}%;top:${n.top}%;animation-delay:${i * 0.4}s`} tabindex="0">
+          <div class="grp-node">
+            <span class="grp-glow" style={`animation-delay:${i === 5 ? 0 : (i < 2 ? 0 : 7)}s`}></span>
+            <div class="grp-icons">
+              {n.icons.map((it) => <img src={it.src} alt="" width="28" height="26" loading="lazy" decoding="async" />)}
+              {n.more > 0 && <span class="grp-more">+{n.more}</span>}
+            </div>
+            <span class="grp-label">{n.label}</span>
           </div>
-          <span class="grp-label">{n.label}</span>
+
+          <div class="grp-pop">
+            <p class="grp-pop-title">{n.label}<span>{n.all.length} tools</span></p>
+            <div class="grp-pop-grid">
+              {n.all.map((it) => (
+                <span class="grp-pop-cell" title={it.name}>
+                  <img src={it.src} alt={it.name} width="30" height="28" loading="lazy" decoding="async" />
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       ))}
     </div>
@@ -174,28 +207,125 @@ const groupNodes = logoGroups.map((g, i) => ({
     50% { box-shadow: 0 0 0 15px rgba(103, 92, 255, 0), 0 0 50px rgba(46, 214, 255, 0.58); }
   }
 
-  /* category cluster nodes */
-  .grp-node {
+  /* category cluster nodes.
+     The slot owns the ring position and the float, so the card can keep
+     overflow:hidden (it clips the glow wash) while the popup, a sibling,
+     escapes the card box. */
+  .grp-slot {
     position: absolute;
-    overflow: hidden;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.55rem;
     /* 160, not 138: at 138 the longer labels ("Ops, Data & Automation",
        "Accounting & Finance") wrapped onto two lines in the real display font,
        so cards ended up different heights and the ring looked uneven. */
     width: 160px;
+    transform: translate(-50%, -50%);
+    animation: hub-float 4.5s ease-in-out infinite;
+    z-index: 3;
+  }
+  /* hovering a card lifts it over its neighbours and stills the float, so the
+     pointer does not have to chase a drifting target into the popup */
+  .grp-slot:hover,
+  .grp-slot:focus-visible { z-index: 20; animation-play-state: paused; }
+  .grp-slot:focus { outline: none; }
+
+  .grp-node {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
     padding: 0.85rem 0.7rem;
     border-radius: 16px;
     border: 1px solid var(--color-line-strong);
     background: linear-gradient(150deg, rgba(19, 25, 50, 0.9), rgba(8, 11, 24, 0.94));
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(8px);
-    animation: hub-float 4.5s ease-in-out infinite;
-    z-index: 3;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
+  .grp-slot:hover .grp-node,
+  .grp-slot:focus-visible .grp-node {
+    border-color: rgba(46, 214, 255, 0.5);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 22px rgba(103, 92, 255, 0.4);
+  }
+
+  /* full tool list, revealed on hover */
+  .grp-pop {
+    position: absolute;
+    width: 300px;
+    padding: 0.8rem 0.85rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(46, 214, 255, 0.28);
+    background: linear-gradient(150deg, rgba(21, 28, 56, 0.98), rgba(7, 10, 22, 0.99));
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.62), 0 0 30px rgba(103, 92, 255, 0.22);
+    backdrop-filter: blur(14px);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.94);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+    z-index: 30;
+  }
+  /* transparent bridge across the 10px gap, so sliding the pointer from the
+     card into the panel does not pass through un-hovered space and close it */
+  .grp-pop::before { content: ""; position: absolute; left: 0; right: 0; height: 14px; }
+
+  .grp-slot.pop-down-center .grp-pop,
+  .grp-slot.pop-down-left .grp-pop,
+  .grp-slot.pop-down-right .grp-pop { top: calc(100% + 10px); transform-origin: top center; }
+  .grp-slot.pop-down-center .grp-pop::before,
+  .grp-slot.pop-down-left .grp-pop::before,
+  .grp-slot.pop-down-right .grp-pop::before { top: -14px; }
+
+  .grp-slot.pop-up-center .grp-pop,
+  .grp-slot.pop-up-left .grp-pop,
+  .grp-slot.pop-up-right .grp-pop { bottom: calc(100% + 10px); transform-origin: bottom center; }
+  .grp-slot.pop-up-center .grp-pop::before,
+  .grp-slot.pop-up-left .grp-pop::before,
+  .grp-slot.pop-up-right .grp-pop::before { bottom: -14px; }
+
+  .grp-slot.pop-down-center .grp-pop,
+  .grp-slot.pop-up-center .grp-pop { left: 50%; margin-left: -150px; }
+  .grp-slot.pop-down-left .grp-pop,
+  .grp-slot.pop-up-left .grp-pop { left: 0; }
+  .grp-slot.pop-down-right .grp-pop,
+  .grp-slot.pop-up-right .grp-pop { right: 0; }
+
+  .grp-slot:hover .grp-pop,
+  .grp-slot:focus-visible .grp-pop,
+  .grp-pop:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+
+  .grp-pop-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .grp-pop-title span { font-size: 10px; font-weight: 600; color: var(--color-acc-2); }
+
+  .grp-pop-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; }
+  .grp-pop-cell {
+    display: grid;
+    place-items: center;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.035);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .grp-pop-cell:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(46, 214, 255, 0.4);
+    transform: translateY(-2px);
+  }
+  .grp-pop-cell img { height: 22px; width: auto; max-width: 26px; object-fit: contain; }
 
   /* even colour wash filling the whole card; plain opacity fade (no circle),
      synced to the comet: in as its head enters, out as its tail enters. */
@@ -236,17 +366,32 @@ const groupNodes = logoGroups.map((g, i) => ({
 
   @media (max-width: 640px) {
     .int-hub { max-width: 420px; }
-    .grp-node { width: 124px; padding: 0.6rem 0.5rem; gap: 0.4rem; border-radius: 13px; }
+    .grp-slot { width: 124px; }
+    .grp-node { padding: 0.6rem 0.5rem; gap: 0.4rem; border-radius: 13px; }
     .grp-icons { gap: 0.4rem; }
     .grp-icons img { height: 20px; max-width: 22px; }
     .grp-more { font-size: 10px; }
     .grp-label { font-size: 9.5px; }
     .int-hub-core { height: 60px; padding: 0 10px; }
     .int-hub-core img { height: 80px; margin: -28px 0; }
+
+    /* 300px will not fit beside a 124px card in a 420px hub, so the panel
+       narrows to four columns. The edge anchoring is deliberately left alone:
+       at 226px every anchor already lands inside the hub, and re-centring the
+       side panels on their card pushed the right-hand one past the viewport
+       and gave the whole page a horizontal scrollbar. */
+    .grp-pop { width: 226px; padding: 0.6rem 0.65rem 0.7rem; border-radius: 13px; }
+    .grp-pop-grid { grid-template-columns: repeat(4, 1fr); gap: 0.3rem; }
+    .grp-pop-cell { height: 36px; border-radius: 8px; }
+    .grp-pop-cell img { height: 18px; max-width: 22px; }
+    .grp-slot.pop-down-center .grp-pop,
+    .grp-slot.pop-up-center .grp-pop { margin-left: -113px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .int-hub-flow path, .int-hub-core, .grp-node, .grp-glow { animation: none; }
+    .int-hub-flow path, .int-hub-core, .grp-slot, .grp-glow { animation: none; }
     .grp-glow { opacity: 0; }
+    .grp-pop { transition: opacity 0.01s, visibility 0.01s; transform: none; }
+    .grp-slot:hover .grp-pop, .grp-slot:focus-visible .grp-pop, .grp-pop:hover { transform: none; }
   }
 </style>
