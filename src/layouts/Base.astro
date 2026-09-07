@@ -112,7 +112,10 @@ const jsonLd = {
          content for JS users (no-JS visitors & crawlers see everything). -->
     <script is:inline>document.documentElement.classList.add("js");</script>
 
-    <!-- Preconnect kept minimal: fonts are self-hosted, so no external font CDN. -->
+    <!-- Preconnect kept minimal: fonts are self-hosted, so no external font CDN.
+         Calendly is the one third party we load - the booking embed in #contact. -->
+    <link rel="preconnect" href="https://assets.calendly.com" />
+    <link rel="preconnect" href="https://calendly.com" />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>

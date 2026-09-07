@@ -11,8 +11,8 @@ export const site = {
   domain: "agency.insertai.com",
   url: "https://agency.insertai.com",
 
-  // ⚠️ PLACEHOLDER - your real booking link (Calendly / Cal.com)
-  bookingUrl: "https://calendly.com/insertai/strategy-call",
+  // Live Calendly event - the discovery call every CTA on the site books.
+  bookingUrl: "https://calendly.com/insertai/discovery-call",
   // ⚠️ PLACEHOLDER - phone number visitors can call your voice agent on
   voiceAgentPhone: "+1 (555) 010-2025",
   voiceAgentPhoneHref: "tel:+15550102025",

@@ -1,26 +1,51 @@
 ---
 /**
- * Calendly-style booking widget: meeting details, month grid, time column.
+ * Live Calendly booking widget (inline embed), inside a branded shell.
  *
- * This is a MOCKUP of the availability only. `isOpen()` / `slotsFor()` below
- * generate a deterministic pattern so the grid looks alive without a backend.
+ * The times are Calendly's real availability and Confirm books a real meeting -
+ * this is the actual scheduler, not a mockup of one.
  *
- * TO GO LIVE WITH CAL.COM / CALENDLY there are two options and neither
- * touches the markup:
- *   1. Keep this UI and replace those two functions with a free-busy fetch.
- *   2. Drop the real embed in and delete this component - the confirm button
- *      already hands off to `site.bookingUrl` with ?month= and &date=, which
- *      is the query shape both Calendly and Cal.com use to deep-link a day.
+ * On the design: the account is on Calendly's free tier (`unbranded: false` on
+ * the event), so the embed's background_color / text_color / primary_color
+ * parameters are ignored and the widget always paints white. It is cross-origin,
+ * so no CSS of ours can reach inside it either. Rather than leave a bare white
+ * rectangle on a near-black page, the widget sits on a white sheet inside a dark
+ * card: the sheet is pure #fff so Calendly's own card melts into it with no
+ * seam, and the dark shell, the brand bar and the gradient edge do the styling
+ * around it. If the plan is ever upgraded, the colour parameters below start
+ * working on their own and the sheet can go.
+ *
+ * `data-resize="true"` makes widget.js post a `calendly.page_height` message on
+ * every step and size the container to match, so a taller step grows the card
+ * instead of being clipped inside a fixed-height box.
+ *
+ * `data-no-blur` matters: the scroll blur-reveal in Base.astro applies a CSS
+ * filter, and a filtered ancestor would blur the iframe and create a new
+ * containing block over it.
  */
 import { site } from "../data/site";
+
+const params = new URLSearchParams({
+  hide_gdpr_banner: "1",
+  background_color: "ffffff",
+  text_color: "1a1a2e",
+  primary_color: "5b6cff",
+});
+const embedUrl = `${site.bookingUrl}?${params.toString()}`;
 ---
 
-<div class="bk" data-booking data-booking-url={site.bookingUrl} data-no-blur>
+<div class="bk" data-booking data-no-blur>
   <!-- ── what you're booking ─────────────────────────────── -->
-  <aside class="bk-info">
-    <img src="/assets/agency-logo/insert ai logo svg black bk.svg" alt="InsertAI" width="150" height="75" class="bk-logo" />
-    <p class="bk-kicker">Architecture review</p>
-    <h3 class="bk-title">Talk to an engineer</h3>
+  <header class="bk-brand">
+    <span class="bk-logo-clip">
+      <img
+        src="/assets/agency-logo/insert ai logo svg black bk.svg"
+        alt="InsertAI"
+        width="150"
+        height="75"
+        class="bk-logo"
+      />
+    </span>
 
     <ul class="bk-meta">
       <li>
@@ -33,473 +58,276 @@ import { site } from "../data/site";
       </li>
       <li>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
-        <span>Eastern Time (US &amp; Canada)</span>
+        Eastern Time (US &amp; Canada)
       </li>
     </ul>
-  </aside>
+  </header>
 
-  <!-- ── month grid ──────────────────────────────────────── -->
-  <div class="bk-cal">
-    <div class="bk-head">
-      <p class="bk-month" data-bk-month aria-live="polite">—</p>
-      <div class="bk-navs">
-        <button type="button" class="bk-nav" data-bk-prev aria-label="Previous month">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <button type="button" class="bk-nav" data-bk-next aria-label="Next month">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
+  <!-- ── the live calendar ───────────────────────────────── -->
+  <div class="bk-sheet">
+    <!-- Calendly replaces the inside of this div with its iframe once widget.js runs -->
+    <div
+      class="calendly-inline-widget bk-embed"
+      data-url={embedUrl}
+      data-resize="true"
+      data-bk-embed
+    ></div>
+
+    <!-- Shown until the iframe paints, and left in place if Calendly is blocked -->
+    <div class="bk-fallback" data-bk-fallback>
+      <span class="bk-spinner" aria-hidden="true"></span>
+      <p class="bk-fallback-text" data-bk-fallback-text>Loading the calendar…</p>
+      <a class="bk-fallback-link" href={site.bookingUrl} target="_blank" rel="noopener noreferrer">
+        Open the booking page <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <noscript>
+      <div class="bk-fallback is-static">
+        <p class="bk-fallback-text">The calendar needs JavaScript.</p>
+        <a class="bk-fallback-link" href={site.bookingUrl} target="_blank" rel="noopener noreferrer">
+          Open the booking page <span aria-hidden="true">→</span>
+        </a>
       </div>
-    </div>
-
-    <!-- weekdays only: the weekend columns were always dead cells, so they are
-         not rendered at all rather than rendered and disabled -->
-    <div class="bk-dow" aria-hidden="true">
-      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
-    </div>
-
-    <div class="bk-grid" data-bk-grid role="grid" aria-label="Available dates"></div>
-  </div>
-
-  <!-- ── times for the chosen day ────────────────────────── -->
-  <div class="bk-times">
-    <p class="bk-times-head" data-bk-day>Select a day</p>
-    <div class="bk-slots" data-bk-slots></div>
-    <a class="bk-confirm is-off" data-bk-confirm href={site.bookingUrl} aria-disabled="true">
-      Confirm <span aria-hidden="true">→</span>
-    </a>
+    </noscript>
   </div>
 </div>
 
 <style>
   .bk {
-    display: grid;
-    grid-template-columns: 16rem minmax(0, 1fr) 13rem;
-    gap: 0;
-    border-radius: 20px;
+    position: relative;
+    border-radius: 24px;
     border: 1px solid var(--color-line-strong);
-    background: linear-gradient(150deg, rgba(19, 25, 50, 0.9), rgba(8, 11, 24, 0.94));
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    background: linear-gradient(150deg, rgba(19, 25, 50, 0.92), rgba(8, 11, 24, 0.96));
+    /* the coloured second shadow is what lifts the card off a near-black page;
+       a neutral drop shadow alone reads as a flat rectangle here */
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5), 0 0 100px rgba(114, 94, 255, 0.14);
+    padding: 0.9rem;
     overflow: hidden;
   }
+  /* gradient hairline along the top edge, picking up the brand ramp */
+  .bk::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #725eff 22%, #2ed6ff 50%, #9b5cff 78%, transparent);
+    opacity: 0.8;
+  }
 
-  /* ── info pane ── */
-  .bk-info {
-    padding: 1.7rem 1.5rem;
-    border-right: 1px solid var(--color-edge);
-    background: rgba(255, 255, 255, 0.015);
-  }
-  /* 100px to match the nav mark. Measured against the rendered pixels: the
-     artwork is flush to the left edge of its box, but vertically it is a 22px
-     band with ~38px of empty box above and ~40px below. So the top and bottom
-     negatives trim real dead space, while the left margin has to stay 0 -
-     anything negative there just pulls the mark out of the text column and it
-     stops lining up with the kicker below it. */
-  .bk-logo { height: 100px; width: auto; margin: -23px 0 -12px 0; }
-  .bk-kicker {
-    margin-top: 0.2rem;
-    font-family: var(--font-mono, monospace);
-    font-size: 0.7rem;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
-    color: var(--color-acc);
-  }
-  .bk-title {
-    margin-top: 0.45rem;
-    font-family: var(--font-display);
-    font-size: 1.45rem;
-    font-weight: 640;
-    letter-spacing: -0.02em;
-    color: #fff;
-  }
-  .bk-meta {
-    margin-top: 1.15rem;
+  /* ── brand bar ── */
+  /* Centred as one group, so the space before the logo and the space after the
+     last chip come out equal on their own - no hand-tuned side padding to keep
+     in sync. The gap is the only spacing that matters and it is shared by the
+     logo-to-chip and chip-to-chip runs. */
+  .bk-brand {
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem 20rem;
+    padding: 0.35rem 0.6rem 0.9rem;
   }
+
+  /* The logo file is a 1500x1500 square whose artwork is a narrow band with a
+     lot of empty box above and below it. A fixed-height box with overflow
+     hidden crops that dead space, which keeps the bar shallow without the
+     negative margins the nav and footer use - those would drag an oversized
+     mark up into the heading above. */
+  .bk-logo-clip {
+    flex: none;
+    display: flex;
+    align-items: center;
+    height: 38px;
+    overflow: hidden;
+  }
+  .bk-logo { height: 124px; width: auto; }
+
+  .bk-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  /* double background: the inner one is the pill fill, the outer paints the
+     brand ramp in the 1px the padding-box leaves exposed, which gives a
+     gradient border without a wrapper element */
   .bk-meta li {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.72);
+    gap: 0.5rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(rgba(16, 21, 44, 0.96), rgba(16, 21, 44, 0.96)) padding-box,
+      linear-gradient(135deg, rgba(114, 94, 255, 0.55), rgba(46, 214, 255, 0.42)) border-box;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.78);
+    white-space: nowrap;
   }
   .bk-meta svg { flex: none; color: var(--color-acc); }
 
-  /* ── calendar pane ── */
-  .bk-cal { padding: 1.9rem 2rem; }
-  .bk-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-  .bk-month {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    font-weight: 620;
-    letter-spacing: -0.01em;
-    color: #fff;
-  }
-  .bk-navs { display: flex; gap: 0.4rem; }
-  .bk-nav {
-    display: grid;
-    place-items: center;
-    height: 32px;
-    width: 32px;
-    border-radius: 9px;
-    border: 1px solid var(--color-line-strong);
-    color: rgba(255, 255, 255, 0.65);
-    background: rgba(255, 255, 255, 0.02);
-    cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease;
-  }
-  .bk-nav:hover:not(:disabled) { border-color: var(--color-acc); color: #fff; }
-  .bk-nav:disabled { opacity: 0.28; cursor: default; }
-
-  /* full-bleed across the calendar column. The cells are deliberately wider
-     than they are tall - at 1fr x 7 a square cell would be ~100px and read as
-     a wall-planner, which is why this used to be capped at 25rem. Fixing the
-     height instead keeps the widget proportions while letting the calendar
-     fill the space. */
-  .bk-dow, .bk-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-  }
-  .bk-dow span {
-    padding-bottom: 0.6rem;
-    text-align: center;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.34);
+  /* ── the white sheet the embed sits on ── */
+  /* #fff exactly, not an off-white: Calendly's own card is pure white, and any
+     other value leaves a visible rectangle where the card ends and the sheet
+     begins. The transparent gutters Calendly leaves around its card become
+     sheet padding, which is why no negative margin is needed to close them. */
+  .bk-sheet {
+    position: relative;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
   }
 
-  /* :global() is required, not stylistic: the day cells and slot pills are
-     built with createElement in the script below, so they never receive
-     Astro's scoped data-astro-cid attribute and unscoped selectors would not
-     match them. Nesting under .bk keeps them from leaking out of here. */
-  .bk :global(.bk-day) {
-    /* five columns instead of seven made each cell much wider, so the cells
-       grow taller too or they read as letterbox slots rather than dates */
-    min-height: 4.2rem;
-    display: grid;
-    place-items: center;
-    border-radius: 12px;
-    border: 1px solid rgba(46, 214, 255, 0.22);
-    background: rgba(46, 214, 255, 0.08);
-    color: rgba(255, 255, 255, 0.92);
-    font-size: 0.95rem;
-    font-weight: 550;
-    cursor: pointer;
-    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  .bk-embed {
+    min-width: 320px;
+    min-height: 700px;
   }
-  .bk :global(.bk-day.is-empty) { background: none; border-color: transparent; cursor: default; }
-  .bk :global(.bk-day:disabled) {
-    background: none;
-    border-color: transparent;
-    color: rgba(255, 255, 255, 0.16);
-    cursor: default;
+  /* Calendly injects the iframe as a child of .bk-embed */
+  .bk :global(.bk-embed iframe) {
+    display: block;
+    width: 100%;
+    border: 0;
   }
-  .bk :global(.bk-day:hover:not(:disabled):not(.is-on)) {
-    border-color: rgba(46, 214, 255, 0.6);
-    color: #fff;
-    transform: translateY(-1px);
-  }
-  .bk :global(.bk-day.is-on) {
-    background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
-    border-color: transparent;
-    color: #fff;
-  }
-  /* the dot is what makes a bookable day readable at a glance on mobile,
-     where the tint alone is easy to miss */
-  /* bottom-anchored rather than offset by margin: the cell height is no longer
-     tied to its width, so a fixed offset from the centre would drift */
-  .bk :global(.bk-day.is-free)::after {
-    content: "";
+
+  /* ── loading / blocked state ── */
+  .bk-fallback {
     position: absolute;
-    bottom: 7px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--color-acc);
-  }
-  .bk :global(.bk-day) { position: relative; }
-  .bk :global(.bk-day.is-on)::after { background: #fff; }
-
-  /* ── times pane ── */
-  .bk-times {
+    inset: 0;
     display: flex;
     flex-direction: column;
-    padding: 1.7rem 1.4rem;
-    border-left: 1px solid var(--color-edge);
-    background: rgba(255, 255, 255, 0.015);
-  }
-  .bk-times-head {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: -0.005em;
-  }
-  .bk-slots {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin: 0.9rem 0 1rem;
-    /* capped so a busy day scrolls its own column instead of stretching the
-       whole card past the calendar next to it */
-    max-height: 22rem;
-    overflow-y: auto;
-    /* Firefox + Chrome 121+. The track is transparent rather than tinted so
-       only the thumb is ever visible against the panel. */
-    scrollbar-width: thin;
-    scrollbar-color: #7d5cff transparent;
-    /* fade the bottom edge: without it the slot sitting on the max-height
-       boundary looks like a clipped, broken pill rather than a hint that the
-       column scrolls */
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.6rem), transparent);
-  }
-  /* older WebKit ignores scrollbar-color, so the grey default would survive
-     there without these */
-  .bk-slots::-webkit-scrollbar { width: 5px; }
-  .bk-slots::-webkit-scrollbar-track { background: transparent; }
-  .bk-slots::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: linear-gradient(180deg, #725eff, #9b5cff);
-  }
-  .bk-slots::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #8a76ff, #b177ff);
-  }
-
-  .bk :global(.bk-slot) {
-    padding: 0.55rem 0.5rem;
-    border-radius: 9px;
-    border: 1px solid var(--color-line-strong);
-    background: rgba(255, 255, 255, 0.02);
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 0.82rem;
-    font-weight: 550;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
-  }
-  .bk :global(.bk-slot:hover) { border-color: var(--color-acc); color: #fff; }
-  .bk :global(.bk-slot.is-on) {
-    background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
-    border-color: transparent;
-    color: #fff;
-  }
-  .bk :global(.bk-hint) {
-    font-size: 0.78rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.38);
-  }
-
-  .bk-confirm {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.9rem;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    /* matches the sheet, so the spinner sits on white rather than punching a
+       dark hole in it */
+    background: #fff;
+    transition: opacity 0.35s ease;
+  }
+  .bk-fallback.is-static { position: static; min-height: 22rem; }
+  .bk-fallback.is-gone { opacity: 0; pointer-events: none; }
+
+  .bk-spinner {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(26, 26, 46, 0.14);
+    border-top-color: #5b6cff;
+    animation: bk-spin 0.8s linear infinite;
+  }
+  @keyframes bk-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .bk-spinner { animation-duration: 2.4s; }
+  }
+  .bk-fallback.is-failed .bk-spinner { display: none; }
+
+  .bk-fallback-text {
+    font-size: 0.88rem;
+    color: rgba(26, 26, 46, 0.6);
+  }
+
+  /* only offered once loading has clearly failed - otherwise it competes with
+     the calendar that is about to appear underneath it */
+  .bk-fallback-link {
+    display: none;
+    align-items: center;
     gap: 0.4rem;
     border-radius: 999px;
-    padding: 0.68rem 1rem;
+    padding: 0.68rem 1.3rem;
     font-size: 0.85rem;
     font-weight: 620;
     color: #fff;
     text-decoration: none;
     background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
     box-shadow: 0 10px 24px rgba(85, 94, 255, 0.32);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: transform 0.2s ease;
   }
-  .bk-confirm:hover:not(.is-off) { transform: translateY(-1px); }
-  .bk-confirm.is-off { opacity: 0.32; pointer-events: none; }
+  .bk-fallback-link:hover { transform: translateY(-1px); }
+  .bk-fallback.is-failed .bk-fallback-link,
+  .bk-fallback.is-static .bk-fallback-link { display: inline-flex; }
 
-  @media (max-width: 960px) {
-    .bk { grid-template-columns: 1fr; }
-    .bk-info { border-right: 0; border-bottom: 1px solid var(--color-edge); }
-    .bk-times { border-left: 0; border-top: 1px solid var(--color-edge); }
-    .bk-slots { max-height: none; }
-    /* side by side once stacked, so a day with many times does not become a
-       long vertical list the visitor has to scroll past */
-    .bk :global(.bk-slot) { flex: none; }
-    .bk-slots { flex-direction: row; flex-wrap: wrap; }
-    .bk :global(.bk-slot) { min-width: 5.2rem; flex: 1 1 5.2rem; }
-  }
-  @media (max-width: 560px) {
-    .bk-cal, .bk-info, .bk-times { padding: 1.2rem 1rem; }
-    .bk-dow, .bk-grid { gap: 4px; }
-    .bk :global(.bk-day) { min-height: 2.6rem; font-size: 0.85rem; border-radius: 8px; }
-    .bk :global(.bk-day.is-free)::after { bottom: 5px; }
+  @media (max-width: 860px) {
+    .bk { padding: 0.6rem; border-radius: 20px; }
+    .bk-brand { padding: 0.3rem 0.35rem 0.75rem; gap: 0.5rem 0.75rem; }
+    .bk-logo-clip { height: 32px; }
+    .bk-logo { height: 104px; }
+    .bk-meta li { font-size: 0.75rem; padding: 0.4rem 0.7rem; }
+    /* Calendly's stacked layout needs the extra room before its first resize
+       message arrives */
+    .bk-embed { min-height: 1000px; }
   }
 </style>
 
 <script>
   document.querySelectorAll("[data-booking]").forEach((root) => {
     const el = root as HTMLElement;
-    const monthEl = el.querySelector("[data-bk-month]") as HTMLElement;
-    const gridEl = el.querySelector("[data-bk-grid]") as HTMLElement;
-    const slotsEl = el.querySelector("[data-bk-slots]") as HTMLElement;
-    const dayEl = el.querySelector("[data-bk-day]") as HTMLElement;
-    const confirmEl = el.querySelector("[data-bk-confirm]") as HTMLAnchorElement;
-    const prevBtn = el.querySelector("[data-bk-prev]") as HTMLButtonElement;
-    const nextBtn = el.querySelector("[data-bk-next]") as HTMLButtonElement;
-    if (!monthEl || !gridEl || !slotsEl) return;
+    const embed = el.querySelector("[data-bk-embed]") as HTMLElement | null;
+    const fallback = el.querySelector("[data-bk-fallback]") as HTMLElement | null;
+    const fallbackText = el.querySelector("[data-bk-fallback-text]") as HTMLElement | null;
+    if (!embed || !fallback) return;
 
-    const bookingUrl = el.dataset.bookingUrl || "#";
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const dayKey = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
-    // ── MOCK AVAILABILITY - replace these two with a real free-busy call ──
-    // Every business day is fully open on 9:00am-6:00pm Eastern, which is what
-    // the info pane advertises. The labels are ET wall-clock and are NOT
-    // converted to the visitor's zone, so if that ever changes the pane's
-    // timezone line has to change with it.
-    const OPEN_MIN = 9 * 60;   // 9:00am ET
-    const CLOSE_MIN = 18 * 60; // 6:00pm ET
-    const STEP = 30;
-
-    // weekends are never rendered, so this only rejects days already past
-    const isOpen = (d: Date) => d >= today;
-
-    const slotsFor = (_d: Date) => {
-      const out: string[] = [];
-      // stop a full slot before closing: a 30-minute call starting at 6:00pm
-      // would run past the hours the pane promises, so 5:30pm is the last one
-      for (let mins = OPEN_MIN; mins + STEP <= CLOSE_MIN; mins += STEP) {
-        const h24 = Math.floor(mins / 60);
-        const m = mins % 60;
-        const ampm = h24 >= 12 ? "pm" : "am";
-        const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-        out.push(`${h12}:${String(m).padStart(2, "0")} ${ampm}`);
-      }
-      return out;
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fallback.classList.add("is-gone");
     };
-    // ─────────────────────────────────────────────────────────────────────
-
-    let view = new Date(today.getFullYear(), today.getMonth(), 1);
-    let selected: Date | null = null;
-    let slot: string | null = null;
-
-    const monthFmt = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
-    const dayFmt = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "short", day: "numeric" });
-
-    const syncConfirm = () => {
-      const ready = Boolean(selected && slot);
-      confirmEl.classList.toggle("is-off", !ready);
-      confirmEl.setAttribute("aria-disabled", String(!ready));
-      if (!ready || !selected) {
-        confirmEl.href = bookingUrl;
-        return;
-      }
-      // ?month=&date= is the deep-link shape Calendly and Cal.com both accept,
-      // so swapping bookingUrl for the real link is the whole integration.
-      const key = dayKey(selected);
-      const sep = bookingUrl.includes("?") ? "&" : "?";
-      confirmEl.href = `${bookingUrl}${sep}month=${key.slice(0, 7)}&date=${key}`;
+    const failed = (msg: string) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fallback.classList.add("is-failed");
+      if (fallbackText) fallbackText.textContent = msg;
     };
 
-    const renderSlots = () => {
-      slotsEl.innerHTML = "";
-      if (!selected) {
-        dayEl.textContent = "Select a day";
-        const p = document.createElement("p");
-        p.className = "bk-hint";
-        p.textContent = "Pick a highlighted date to see the times open that day.";
-        slotsEl.appendChild(p);
-        syncConfirm();
-        return;
-      }
+    // If Calendly is blocked by an extension or the network, stop spinning and
+    // hand the visitor the plain link rather than an empty card.
+    const timer = setTimeout(
+      () => failed("The calendar could not load here."),
+      10000
+    );
 
-      dayEl.textContent = dayFmt.format(selected);
-      const times = slotsFor(selected);
-      if (!times.length) {
-        const p = document.createElement("p");
-        p.className = "bk-hint";
-        p.textContent = "Fully booked - try another day.";
-        slotsEl.appendChild(p);
-        syncConfirm();
-        return;
-      }
-
-      for (const t of times) {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "bk-slot" + (slot === t ? " is-on" : "");
-        b.textContent = t;
-        b.addEventListener("click", () => {
-          slot = t;
-          renderSlots();
-        });
-        slotsEl.appendChild(b);
-      }
-      syncConfirm();
+    // Calendly builds the iframe asynchronously after widget.js runs, so watch
+    // for it rather than assuming it exists once the script has loaded.
+    const adopt = (frame: HTMLIFrameElement) => {
+      watch.disconnect();
+      frame.addEventListener("load", done, { once: true });
+      // already painted from cache - the load event would never fire again
+      if (frame.contentWindow) setTimeout(done, 1200);
     };
-
-    const render = () => {
-      monthEl.textContent = monthFmt.format(view);
-
-      const atStart =
-        view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
-      if (prevBtn) prevBtn.disabled = atStart;
-
-      gridEl.innerHTML = "";
-      const first = new Date(view.getFullYear(), view.getMonth(), 1);
-      // 0=Mon..6=Sun (getDay() is Sunday-first). With weekends dropped the grid
-      // is five wide, so a month opening on Sat or Sun has no lead at all - its
-      // first cell is the Monday that follows.
-      const firstDow = (first.getDay() + 6) % 7;
-      const lead = firstDow > 4 ? 0 : firstDow;
-      const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
-
-      for (let i = 0; i < lead; i += 1) {
-        const s = document.createElement("span");
-        s.className = "bk-day is-empty";
-        gridEl.appendChild(s);
-      }
-
-      for (let d = 1; d <= daysInMonth; d += 1) {
-        const date = new Date(view.getFullYear(), view.getMonth(), d);
-        if ((date.getDay() + 6) % 7 > 4) continue; // Sat/Sun get no cell
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "bk-day";
-        btn.textContent = String(d);
-        const open = isOpen(date);
-        btn.disabled = !open;
-        if (open) {
-          btn.classList.add("is-free");
-          btn.setAttribute("aria-label", dayFmt.format(date));
-          btn.addEventListener("click", () => {
-            selected = date;
-            slot = null;
-            render();
-          });
-        }
-        if (selected && dayKey(selected) === dayKey(date)) btn.classList.add("is-on");
-        gridEl.appendChild(btn);
-      }
-
-      renderSlots();
-    };
-
-    prevBtn?.addEventListener("click", () => {
-      view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
-      render();
+    const watch = new MutationObserver(() => {
+      const frame = embed.querySelector("iframe");
+      if (frame) adopt(frame);
     });
-    nextBtn?.addEventListener("click", () => {
-      view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
-      render();
+    watch.observe(embed, { childList: true, subtree: true });
+
+    // covers the case where widget.js was already on the page and had filled
+    // this embed in before we started observing
+    const present = embed.querySelector("iframe");
+    if (present) adopt(present);
+
+    // The embed reports its own height as the visitor moves through the steps;
+    // treat the first report as "it is alive" too, in case the iframe load
+    // event is swallowed.
+    window.addEventListener("message", (e: MessageEvent) => {
+      if (e.data?.event === "calendly.page_height") done();
     });
 
-    render();
+    // Load widget.js once per page, even if the component appears twice.
+    const SRC = "https://assets.calendly.com/assets/external/widget.js";
+    const existing = document.querySelector(`script[src="${SRC}"]`);
+    if (!existing) {
+      const s = document.createElement("script");
+      s.src = SRC;
+      s.async = true;
+      s.addEventListener("error", () =>
+        failed("The calendar could not load here.")
+      );
+      document.head.appendChild(s);
+    }
   });
 </script>
