@@ -1,7 +1,11 @@
 ---
 import { site } from "../data/site";
-// LogoScene (AI-hexagon model) is preserved (./LogoScene.astro) - swap back any time.
-import CrystalScene from "./CrystalScene.astro";
+// The integrations hub replaced the 3D crystal here, and the standalone
+// Integrations section went with it - the hub carries that story on its own.
+// CrystalScene (./CrystalScene.astro) and LogoScene (./LogoScene.astro) are
+// both preserved and can be swapped back in any time. Dropping the crystal
+// also drops three.js, which was 553KB of the client bundle on its own.
+import IntegrationsHub from "./IntegrationsHub.astro";
 ---
 
 <section id="top" class="relative overflow-hidden pt-24 lg:pt-24">
@@ -98,8 +102,8 @@ import CrystalScene from "./CrystalScene.astro";
           </script>
         </div>
 
-        <div class="relative min-h-[420px] lg:min-h-[620px]">
-          <CrystalScene />
+        <div class="relative flex items-center justify-center py-6 lg:py-0">
+          <IntegrationsHub />
         </div>
       </div>
 

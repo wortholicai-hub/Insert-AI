@@ -5,7 +5,8 @@
 //
 // Every slug here has a matching file in public/assets/logos-color. Adding a
 // slug without the SVG silently drops it from the card and the popup rather
-// than rendering a placeholder - see colorFor() in IntegrationsWall.astro.
+// than rendering a placeholder - see colorFor() in IntegrationsHub.astro.
+// Files are .svg unless the vendor publishes no vector (see gohighlevel.png).
 export const logoGroups = [
   {
     label: "Accounting & Finance",
@@ -19,12 +20,10 @@ export const logoGroups = [
       { slug: "sage", name: "Sage" },
       { slug: "expensify", name: "Expensify" },
       { slug: "razorpay", name: "Razorpay" },
-      { slug: "adyen", name: "Adyen" },
       { slug: "klarna", name: "Klarna" },
       { slug: "revolut", name: "Revolut" },
       { slug: "payoneer", name: "Payoneer" },
       { slug: "brex", name: "Brex" },
-      { slug: "intuit", name: "Intuit" },
       { slug: "coinbase", name: "Coinbase" },
     ],
   },
@@ -32,6 +31,7 @@ export const logoGroups = [
     label: "CRM & Marketing",
     items: [
       { slug: "hubspot", name: "HubSpot" },
+      { slug: "gohighlevel", name: "GoHighLevel" },
       { slug: "mailchimp", name: "MailChimp" },
       { slug: "zoho", name: "Zoho" },
       { slug: "intercom", name: "Intercom" },
@@ -46,6 +46,13 @@ export const logoGroups = [
       { slug: "typeform", name: "Typeform" },
       { slug: "webflow", name: "Webflow" },
       { slug: "wordpress", name: "WordPress" },
+      { slug: "odoo", name: "Odoo" },
+      { slug: "helpscout", name: "Help Scout" },
+      { slug: "chatwoot", name: "Chatwoot" },
+      { slug: "campaignmonitor", name: "Campaign Monitor" },
+      { slug: "substack", name: "Substack" },
+      { slug: "googletagmanager", name: "Google Tag Manager" },
+      { slug: "mixpanel", name: "Mixpanel" },
     ],
   },
   {

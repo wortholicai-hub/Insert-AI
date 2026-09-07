@@ -2,14 +2,26 @@
 import fs from "node:fs";
 import { logoGroups } from "../data/logos";
 
-const listSlugs = (dir) =>
-  new Set(
-    fs.existsSync(dir)
-      ? fs.readdirSync(dir).filter((f) => f.endsWith(".svg")).map((f) => f.slice(0, -4))
-      : [],
-  );
-const colorSet = listSlugs("public/assets/logos-color");
-const colorFor = (slug) => (colorSet.has(slug) ? `/assets/logos-color/${slug}.svg` : undefined);
+/* Slug -> filename, so a brand can ship either format.
+
+   Everything here is an SVG lifted from simple-icons, but that package carries
+   no icon for several major CRMs - Salesforce, Pipedrive, GoHighLevel, Klaviyo,
+   Monday.com and others were withdrawn from it - so those have to come from the
+   vendor direct, and what the vendor publishes is not always a vector. SVG wins
+   when a brand has both. */
+const listLogos = (dir) => {
+  const map = new Map();
+  if (!fs.existsSync(dir)) return map;
+  for (const f of fs.readdirSync(dir)) {
+    const m = /^(.+)\.(svg|png)$/.exec(f);
+    if (!m) continue;
+    if (m[2] === "svg" || !map.has(m[1])) map.set(m[1], f);
+  }
+  return map;
+};
+const colorFiles = listLogos("public/assets/logos-color");
+const colorFor = (slug) =>
+  colorFiles.has(slug) ? `/assets/logos-color/${colorFiles.get(slug)}` : undefined;
 
 // Layout lives in a 900x720 viewBox that shares the hub container's aspect
 // ratio (uniform scale). Cards are placed by %, and each wire is an orthogonal
@@ -173,23 +185,11 @@ const groupNodes = logoGroups.map((g, i) => {
 });
 ---
 
-<section id="integrations" class="py-5">
-  <div class="site-shell">
-    <div class="text-center">
-      <p class="mono text-[--color-acc]">Integrations</p>
-      <!-- deliberately not inside a max-w-2xl wrapper: at 3rem this headline
-           needs ~900px and was wrapping to two lines inside 672px. -->
-      <h2 class="display mt-4 text-[clamp(2rem,4vw,3rem)]">Plugs into the tools you <span class="accent">already use.</span></h2>
-      <p class="mx-auto mt-4 max-w-xl text-base leading-7 text-[--color-fg-muted]">
-        Connect with 200+ popular business tools and platforms - data flows automatically across everything you run.
-      </p>
-    </div>
-
-    <!-- the hub used to be aria-hidden wholesale; now that the cards expose a
-         real tool list on hover/focus it carries content, and a focusable
-         popup trigger inside an aria-hidden subtree is invalid. The purely
-         decorative wires keep their own aria-hidden instead. -->
-    <div class="int-hub">
+<!-- The hub used to be aria-hidden wholesale; now that the cards expose a real
+     tool list on hover/focus it carries content, and a focusable popup trigger
+     inside an aria-hidden subtree is invalid. The purely decorative wires keep
+     their own aria-hidden instead. -->
+<div class="int-hub">
       <svg class="int-hub-wires" viewBox="0 0 900 720" fill="none" aria-hidden="true">
         <defs>
           <!-- userSpaceOnUse, not the default objectBoundingBox: a perfectly
@@ -262,17 +262,26 @@ const groupNodes = logoGroups.map((g, i) => {
           </div>
         </div>
       ))}
-    </div>
-  </div>
-</section>
+</div>
 
 <style>
+  /* container-type is what lets everything inside size itself against the hub's
+     own width rather than the viewport. The hub was drawn at 780px with 160px
+     cards; dropped into the hero's right column it gets ~620-700px, and with
+     the cards still a fixed 160 they crowd the ring and the wire ends stop
+     lining up with the boxes. Sizing them in cqw holds every ratio the wire
+     geometry assumes, at whatever width the column happens to be.
+
+     Each cqw rule is preceded by its px equivalent at 780px, so a browser
+     without container query units drops the cqw line and keeps the original
+     fixed size rather than collapsing to auto. */
   .int-hub {
     position: relative;
+    container-type: inline-size;
     width: 100%;
     max-width: 780px;
     aspect-ratio: 900 / 720;
-    margin: 3rem auto 0;
+    margin: 0 auto;
   }
   .int-hub-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
@@ -351,7 +360,9 @@ const groupNodes = logoGroups.map((g, i) => {
     display: grid;
     place-items: center;
     height: 80px;
+    height: 10.26cqw;
     padding: 0 14px;
+    padding: 0 1.79cqw;
     border-radius: 999px;
     background: linear-gradient(135deg, #1c2650, #0b0f1e);
     border: 1px solid rgba(46, 214, 255, 0.35);
@@ -360,6 +371,7 @@ const groupNodes = logoGroups.map((g, i) => {
     z-index: 2;
   }
   .int-hub-core img { height: 100px; width: auto; margin: -36px 0; }
+  .int-hub-core img { height: 12.82cqw; margin: -4.62cqw 0; }
   @keyframes hub-pulse {
     0%, 100% { box-shadow: 0 0 0 7px rgba(103, 92, 255, 0.1), 0 0 30px rgba(103, 92, 255, 0.42); }
     50% { box-shadow: 0 0 0 15px rgba(103, 92, 255, 0), 0 0 50px rgba(46, 214, 255, 0.58); }
@@ -375,6 +387,7 @@ const groupNodes = logoGroups.map((g, i) => {
        "Accounting & Finance") wrapped onto two lines in the real display font,
        so cards ended up different heights and the ring looked uneven. */
     width: 160px;
+    width: 20.51cqw;
     transform: translate(-50%, -50%);
     animation: hub-float 4.5s ease-in-out infinite;
     z-index: 3;
@@ -392,8 +405,11 @@ const groupNodes = logoGroups.map((g, i) => {
     flex-direction: column;
     align-items: center;
     gap: 0.55rem;
+    gap: 1.13cqw;
     padding: 0.85rem 0.7rem;
+    padding: 1.74cqw 1.44cqw;
     border-radius: 16px;
+    border-radius: 2.05cqw;
     border: 1px solid var(--color-line-strong);
     background: linear-gradient(150deg, rgba(19, 25, 50, 0.9), rgba(8, 11, 24, 0.94));
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
@@ -514,12 +530,16 @@ const groupNodes = logoGroups.map((g, i) => {
   }
 
   .grp-icons { position: relative; z-index: 2; display: flex; align-items: center; gap: 0.55rem; }
+  .grp-icons { gap: 1.13cqw; }
   .grp-icons img { height: 26px; width: auto; max-width: 28px; object-fit: contain; }
+  .grp-icons img { height: 3.33cqw; max-width: 3.59cqw; }
   .grp-more { font-size: 11px; font-weight: 700; color: var(--color-acc-2); }
+  .grp-more { font-size: 1.41cqw; }
   .grp-label {
     position: relative;
     z-index: 2;
     font-size: 11px;
+    font-size: 1.41cqw;
     font-weight: 600;
     line-height: 1.2;
     text-align: center;
