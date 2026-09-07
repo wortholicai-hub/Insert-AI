@@ -28,21 +28,69 @@ const positions = [
    it. The viewBox is 900x720 because the old 582 height capped the radius at
    ~248 and left the cards crowding the hub.
 
-   Wires are orthogonal L-routes, not straight radial spokes. Spokes docked
-   hub-edge to card-edge and came out 150-201 units, which made the comets
-   short and stubby, and every one left from the same ring. These leave from
-   six distinct points on the pill's top and bottom edges and all land within
-   198-201 units, so the comets read at a consistent length. */
-const wires = [
-  [[450, 314], [450, 113]],              // top
-  [[510, 314], [510, 215], [609, 215]],  // upper-right
-  [[390, 314], [390, 215], [291, 215]],  // upper-left
-  [[510, 406], [510, 505], [609, 505]],  // lower-right
-  [[390, 406], [390, 505], [291, 505]],  // lower-left
-  [[450, 406], [450, 607]],              // bottom
+   Every wire is a straight radial spoke that starts at the hub's exact centre
+   and runs outward to its card. The previous routing was orthogonal L-routes
+   leaving six separate points along the pill's top and bottom edges - which
+   meant the four diagonal wires set off vertically and only turned toward
+   their card halfway there. Extend one of those back and it pointed at the
+   pill's shoulder, not at the middle, and the corner cards read as wired to
+   the side of the hub rather than to its heart.
+
+   Starting at the centre rather than at the pill's edge is deliberate: the
+   pill sits above the SVG (z-index 2), so it hides the first ~40-64 units of
+   every spoke and the comets appear to surface from underneath the mark. That
+   is what sells the traffic as originating in the hub.
+
+   Every wire opens with a straight run along that radial line, so it sets off
+   pointing out of the centre, then turns twice on its way to the card. The
+   turns are what stop it reading as a plain spoke: each wire strikes out from
+   the middle, breaks, tracks across, and comes into its card from a side.
+
+   The routes are deliberately not six copies of one shape - they turn at
+   different distances and dock at different points along their card's facing
+   edge, so the ring does not look mirrored. Corners are rounded by roundedPath
+   below, which keeps the breaks crisp rather than curved. */
+const HUB = [450, 360];
+
+/* Unit vectors on the 60-degree ring, in wire order: top, upper-right,
+   upper-left, lower-right, lower-left, bottom. */
+const DIRS = [
+  [0, -1],
+  [0.86581, -0.50017],
+  [-0.86581, -0.50017],
+  [0.86581, 0.50017],
+  [-0.86581, 0.50017],
+  [0, 1],
+];
+/* a point r units out from the hub along wire i's radial - the opening run */
+const out = (i, r) => [
+  +(HUB[0] + DIRS[i][0] * r).toFixed(1),
+  +(HUB[1] + DIRS[i][1] * r).toFixed(1),
 ];
 
-// Build an SVG path of orthogonal segments with rounded corners.
+/* Wires end a little way INSIDE their card, not on its edge.
+
+   A card is 160x77 CSS px, which is 185x89 viewBox units at the container's
+   780px maximum - so its edges sit 92 out horizontally but only 45 vertically.
+   Docking the top and bottom wires at 133 and 587 assumed the same 63 as the
+   sides and left both of them 18 units short, which is the gap between the
+   line and the box.
+
+   Rather than pin the ends to a measurement that moves, every wire now
+   overshoots into its card, which sits above the SVG (z-index 3) and hides the
+   overlap. The join closes itself: the card always covers the surplus, and it
+   covers more of it as the container narrows and the fixed-px cards grow
+   against the scaling viewBox. */
+const wires = [
+  [HUB, out(0, 110), [520, 250], [520, 104]], // top: out, right, up under the card
+  [HUB, out(1, 145), [575.5, 215], [623, 215]], // upper-right: out, up, right into the flank
+  [HUB, out(2, 145), [324.5, 178], [277, 178]], // upper-left: turns higher than its mirror
+  [HUB, out(3, 145), [575.5, 540], [623, 540]], // lower-right: docks low on the flank
+  [HUB, out(4, 145), [324.5, 505], [277, 505]], // lower-left
+  [HUB, out(5, 110), [378, 470], [378, 616]], // bottom: out, left, down under the card
+];
+
+// Build an SVG path of straight segments with rounded corners at the bends.
 function roundedPath(pts, r) {
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) || 1;
   let d = `M${pts[0][0]} ${pts[0][1]}`;
@@ -60,10 +108,46 @@ function roundedPath(pts, r) {
   d += ` L${l[0]} ${l[1]}`;
   return d;
 }
-const paths = wires.map((w) => roundedPath(w, 22));
 
-// Two waves per cycle: the upper three fire, then the lower three.
-const delayFor = (i) => (i < 3 ? 0 : 4.5);
+const paths = wires.map((w) => roundedPath(w, 20));
+
+/* One offset per wire inside the 9s cycle.
+
+   These used to fire in two blocks - the three upper wires together, then the
+   three lower - which read as a machine sweeping the ring rather than traffic
+   moving through a hub. The offsets below are deliberately uneven (gaps of
+   1.15, 1.45, 1.3, 1.7, 1.5) and they alternate between an upper and a lower
+   wire, so no two neighbours ever light together and the eye cannot lock onto
+   a pattern. Index order is: top, upper-right, upper-left, lower-right,
+   lower-left, bottom - so the firing order is top, lower-right, upper-left,
+   bottom, upper-right, lower-left.
+
+   Fixed rather than randomised: the server renders these into inline styles,
+   so a random draw would differ between the build and any rehydration, and
+   would also change on every deploy for no reason. */
+const CYCLE = 9;
+const WIRE_DELAY = [0, 5.6, 2.6, 1.15, 7.1, 3.9];
+const delayFor = (i) => WIRE_DELAY[i];
+
+/* When the charge actually reaches the card, derived from the dash rather than
+   guessed - the card must light on contact or the glow reads as decoration
+   running on its own timer.
+
+   hub-flow drives stroke-dashoffset from 58 to -158 across the first 45% of
+   the cycle, against a "58 200" dash on a path normalised to pathLength 100.
+   The lit segment covers path positions -offset to -offset+58, so its leading
+   edge touches the far end (100) when the offset passes 58-100 = -42. That is
+   (58 - -42) / (58 - -158) = 46.3% of the way through the travel phase.
+
+   The previous value was CYCLE * 0.45 - the moment the dash finishes leaving
+   the far end, not the moment it arrives - so every card lit about 2.2s after
+   its own current had already gone through, which is why they looked like they
+   were glowing at random. */
+const TRAVEL = 0.45;
+const DASH = 58, OFFSET_FROM = 58, OFFSET_TO = -158;
+const ARRIVE =
+  CYCLE * TRAVEL * ((OFFSET_FROM - (DASH - 100)) / (OFFSET_FROM - OFFSET_TO));
+const glowDelayFor = (i) => +(((WIRE_DELAY[i] + ARRIVE) % CYCLE).toFixed(2));
 
 // Popup placement per ring position. The top row opens downwards and the
 // bottom row upwards so the panel always unfolds towards the middle of the
@@ -117,17 +201,35 @@ const groupNodes = logoGroups.map((g, i) => {
             <stop offset="0" stop-color="#1ed6ff" />
             <stop offset="1" stop-color="#7b5cff" />
           </linearGradient>
+          <!-- the bleed that makes the charge read as current rather than a
+               coloured dash. Blur only: the sharp copy is drawn separately on
+               top, so this stays a pure halo. -->
+          <filter id="hubglow" x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
         </defs>
-        <!-- only the moving comet is drawn; the connecting track stays invisible -->
-        <g class="int-hub-flow" stroke="url(#hubwire)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="58 200">
+
+        <!-- the conductor: always drawn, barely lit, so the route exists
+             between pulses instead of the charge crossing empty space -->
+        <g class="int-hub-rail" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+          {paths.map((d) => <path d={d} />)}
+        </g>
+
+        <!-- halo and filament share one dash pattern, one animation and one
+             delay, so they travel locked together and read as a single charge
+             with a bright centre rather than two passes -->
+        <g class="int-hub-flow int-hub-halo" filter="url(#hubglow)" stroke="url(#hubwire)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="58 200">
           {paths.map((d, i) => (
-            <path
-              d={d}
-              pathLength="100"
-              style={`animation-delay:${delayFor(i)}s`}
-            />
+            <path d={d} pathLength="100" style={`animation-delay:${delayFor(i)}s`} />
           ))}
         </g>
+
+        <g class="int-hub-flow int-hub-filament" stroke="#eaf7ff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="58 200">
+          {paths.map((d, i) => (
+            <path d={d} pathLength="100" style={`animation-delay:${delayFor(i)}s`} />
+          ))}
+        </g>
+
       </svg>
 
       <div class="int-hub-core">
@@ -137,7 +239,10 @@ const groupNodes = logoGroups.map((g, i) => {
       {groupNodes.map((n, i) => (
         <div class={`grp-slot pop-${n.side}`} style={`left:${n.left}%;top:${n.top}%;animation-delay:${i * 0.4}s`} tabindex="0">
           <div class="grp-node">
-            <span class="grp-glow" style={`animation-delay:${i === 5 ? 0 : (i < 2 ? 0 : 7)}s`}></span>
+            <span class="grp-glow" style={`animation-delay:${glowDelayFor(i)}s`}></span>
+            <!-- the card taking the charge: fires on the same clock as the
+                 wire that feeds it, so the box lights as the pulse lands -->
+            <span class="grp-zap" style={`animation-delay:${glowDelayFor(i)}s`}></span>
             <div class="grp-icons">
               {n.icons.map((it) => <img src={it.src} alt="" width="28" height="26" loading="lazy" decoding="async" />)}
               {n.more > 0 && <span class="grp-more">+{n.more}</span>}
@@ -170,6 +275,59 @@ const groupNodes = logoGroups.map((g, i) => {
     margin: 3rem auto 0;
   }
   .int-hub-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  /* ── current ── */
+  /* the unlit conductor. Kept very dark: bright enough that the six routes
+     read as a wired ring at rest, dim enough that the travelling charge is
+     still clearly the thing moving. */
+  .int-hub-rail path { stroke: rgba(120, 140, 220, 0.075); }
+
+  /* the halo is what sells it as charge rather than a coloured dash - it is
+     the same stroke blurred wide underneath the filament */
+  .int-hub-halo path { opacity: 0.75; }
+
+  /* the filament flickers as it travels. Irregular stops, and no flicker at
+     all across the middle of the run, so it reads as an unsteady contact
+     rather than a strobe. The animation-delay set inline applies to both the
+     travel and the flicker, which is what keeps the six wires out of phase
+     with each other. */
+  .int-hub-filament path {
+    animation: hub-flow 9s linear infinite, hub-flicker 1.1s linear infinite;
+  }
+  @keyframes hub-flicker {
+    0%, 30%, 62%, 100% { opacity: 1; }
+    12% { opacity: 0.55; }
+    18% { opacity: 0.92; }
+    74% { opacity: 0.66; }
+  }
+
+  /* The card taking the charge. Inset shadows only - .grp-node clips its
+     overflow, so an outer glow would be cut off at the border; lighting the
+     inside edge reads as the box energising anyway.
+
+     Sits at z-index 1: above the ripple, below the icons and label, so the
+     flash rims the card without washing out the logos. */
+  .grp-zap {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow:
+      inset 0 0 0 1px rgba(46, 214, 255, 0.85),
+      inset 0 0 20px rgba(46, 214, 255, 0.4),
+      inset 0 0 44px rgba(114, 94, 255, 0.35);
+    animation: grp-zap 9s linear infinite;
+  }
+  /* hits hard and drains, rather than fading symmetrically in and out - that
+     is the difference between a strike and a pulse */
+  @keyframes grp-zap {
+    0%, 100% { opacity: 0; }
+    2% { opacity: 1; }
+    5% { opacity: 0.62; }
+    15% { opacity: 0; }
+  }
 
   /* one comet segment per wire, following the bends smoothly, hub -> card.
      head reaches the card at 54% of the cycle, tail at 77%. */
@@ -339,11 +497,19 @@ const groupNodes = logoGroups.map((g, i) => {
     opacity: 0;
     animation: grp-ripple 9s linear infinite;
   }
+  /* Fires at the very start of its cycle, because the delay it is given is
+     already the arrival time - so the card is lit for the ~1.1s the charge
+     spends entering it and is dark the rest of the 9s.
+
+     It used to open at 22% and close at 45%, roughly 2.0-4.1s after its delay.
+     Stacked on a delay that was itself 2.2s late, the card ended up glowing
+     around 6s after its own pulse had passed, with nothing on the wire to
+     explain it. */
   @keyframes grp-ripple {
-    0%, 22% { opacity: 0; }
-    28% { opacity: 1; }
-    35% { opacity: 1; }
-    45% { opacity: 0; }
+    0% { opacity: 0; }
+    2% { opacity: 1; }
+    12% { opacity: 0.85; }
+    19% { opacity: 0; }
     100% { opacity: 0; }
   }
 
@@ -389,8 +555,13 @@ const groupNodes = logoGroups.map((g, i) => {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .int-hub-flow path, .int-hub-core, .grp-slot, .grp-glow { animation: none; }
+    .int-hub-flow path, .int-hub-core, .grp-slot, .grp-glow, .grp-zap { animation: none; }
     .grp-glow { opacity: 0; }
+    /* the charge is what moved, so with motion off it goes entirely and the
+       conductor is brightened instead - the ring still reads as wired */
+    .int-hub-flow path { opacity: 0; }
+    .int-hub-rail path { stroke: rgba(120, 140, 220, 0.34); }
+    .grp-zap { opacity: 0; }
     .grp-pop { transition: opacity 0.01s, visibility 0.01s; transform: none; }
     .grp-slot:hover .grp-pop, .grp-slot:focus-visible .grp-pop, .grp-pop:hover { transform: none; }
   }
