@@ -68,11 +68,29 @@ body::before {
   color: white;
 }
 
-::-webkit-scrollbar { width: 9px; }
-::-webkit-scrollbar-track { background: var(--color-ink); }
+/* Page scrollbar, matched to the booking widget's slot column so the site has
+   one scrollbar rather than a thin purple one inside a heavy grey one. These
+   selectors are unscoped and so apply to every scrolling element on the site;
+   anything wanting its own treatment has to outrank them, which is what
+   .bk-slots and .legal-body do.
+
+   The old rule was 9px on a solid --color-ink track: the track is what read as
+   grey, since the thumb only ever covered part of it. Dropping the track to
+   transparent means only the thumb is ever drawn. */
+html {
+  /* Firefox, and Chrome 121+ which supports the standard properties */
+  scrollbar-width: thin;
+  scrollbar-color: #7d5cff transparent;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(103, 92, 255, 0.52);
   border-radius: 999px;
+  background: linear-gradient(180deg, #725eff, #9b5cff);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8a76ff, #b177ff);
 }
 
 .site-shell {
