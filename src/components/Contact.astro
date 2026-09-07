@@ -1,0 +1,51 @@
+---
+/**
+ * Bottom-of-page contact section. This replaced the standalone /contact page:
+ * booking is the single call to action, so every "book"/"talk to us" link on
+ * the site now scrolls to #contact rather than leaving the page.
+ */
+import BookingCalendar from "./BookingCalendar.astro";
+import { site } from "../data/site";
+---
+
+<section id="contact" class="py-5 scroll-mt-24">
+  <div class="site-shell">
+    <div class="mx-auto max-w-2xl pb-9 text-center">
+      <p class="mono text-[--color-acc]">Contact</p>
+      <h2 class="display mt-4 text-[clamp(2rem,4vw,3.35rem)]">
+        Pick a time that <span class="accent">suits you.</span>
+      </h2>
+      <p class="mx-auto mt-4 max-w-lg text-base leading-7 text-[--color-fg-muted]">
+        Thirty minutes with the engineer who'd build it - not a sales call.
+        Bring the workflow, the product idea, or the bottleneck.
+      </p>
+    </div>
+
+    <div class="mx-auto max-w-5xl">
+      <BookingCalendar />
+
+      <p class="ct-line">
+        Would rather write or call?
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+        <span class="ct-dot" aria-hidden="true"></span>
+        <a href={site.voiceAgentPhoneHref}>{site.voiceAgentPhone}</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ct-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.85rem;
+  }
+  .ct-line a { color: rgba(255, 255, 255, 0.72); transition: color 0.2s ease; }
+  .ct-line a:hover { color: #fff; }
+  .ct-dot { width: 3px; height: 3px; border-radius: 50%; background: #36426c; }
+</style>

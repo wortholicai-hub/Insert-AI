@@ -1,7 +1,7 @@
 ---
-import Reviews from "./Reviews.astro";
-import MiniCalendar from "./MiniCalendar.astro";
-
+// Reviews and the booking calendar used to sit here. Booking now lives in the
+// contact section at the foot of the page, with the reviews directly under it,
+// so this section is purely the positioning argument.
 const compare = [
   { who: "Freelancers", build: "build tasks." },
   { who: "Software houses", build: "build apps." },
@@ -16,16 +16,8 @@ const compare = [
       <h2 class="display mt-4 text-[clamp(2rem,4vw,3.35rem)]">Proof that goes beyond <span class="accent">pretty demos.</span></h2>
     </div>
 
-    <!-- quote + booking calendar -->
-    <!-- fixed 340px calendar column: on a fluid 1fr it stretched to ~590px and
-         the day cells ballooned to 80px, which is the opposite of compact -->
-    <div class="grid gap-4 lg:grid-cols-[1fr_340px]">
-      <Reviews />
-      <MiniCalendar />
-    </div>
-
     <!-- why us vs others -->
-    <div class="mt-4 soft-card p-8">
+    <div class="soft-card p-8">
       <h3 class="display text-[clamp(1.4rem,2.6vw,2rem)] text-white">
         Not just workflows. Not just apps. <span class="accent">Complete AI systems.</span>
       </h3>
