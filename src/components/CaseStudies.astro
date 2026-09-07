@@ -32,7 +32,12 @@ const capabilities = [
         alt: "ScaleNexus.AI - AI-powered dental front desk: call dashboard, callback queue and appointment booking",
       },
       "/assets/Our services/SaaS Platforms/5.png",
-      "/assets/Our services/SaaS Platforms/6.png",
+      {
+        src: "/assets/Our services/SaaS Platforms/6.png",
+        href: "https://trafft.com/",
+        label: "Visit Trafft",
+        alt: "Trafft - booking and scheduling platform with services, staff and appointment management",
+      },
     ] },
   { title: "AI Voice Agents", desc: "Inbound & outbound calls, wired to your CRM.",
     icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>`,
@@ -41,8 +46,18 @@ const capabilities = [
       "/assets/Our services/ai voice agents/2.png",
       "/assets/Our services/ai voice agents/3.png",
       "/assets/Our services/ai voice agents/4.png",
-      "/assets/Our services/ai voice agents/5.png",
-      "/assets/Our services/ai voice agents/6.png",
+      {
+        src: "/assets/Our services/ai voice agents/5.png",
+        href: "https://retellai.com/",
+        label: "Visit Retell AI",
+        alt: "Retell AI - voice agent analytics: call duration, call counts and latency dashboard",
+      },
+      {
+        src: "/assets/Our services/ai voice agents/6.png",
+        href: "https://vapi.ai/",
+        label: "Visit Vapi",
+        alt: "Vapi - voice agent console: phone numbers, assistants and outbound call settings",
+      },
     ] },
   { title: "AI Chat Agents", desc: "Support & sales chat that qualifies and acts.",
     icon: `<path d="M4 5h16v11H9l-4 3.5V16H4V5z"/><path d="M8.5 10h0M12 10h0M15.5 10h0"/>`,
@@ -111,7 +126,12 @@ const capabilities = [
       // firm. A dev shop's own site in a portfolio of client platforms reads
       // as either a competitor or our own marketing, not as delivered work.
       "/assets/Our services/Custom Web Apps/11.png",
-      "/assets/Our services/Custom Web Apps/12.png",
+      {
+        src: "/assets/Our services/Custom Web Apps/12.png",
+        href: "https://voxelo.ai/",
+        label: "Visit Voxelo",
+        alt: "Voxelo - 3D and AI studio for ecommerce, turning video into 3D product models",
+      },
       "/assets/Our services/Custom Web Apps/13.png",
     ] },
 ];
@@ -184,8 +204,8 @@ const asMedia = (m) =>
                   style="image-rendering: -webkit-optimize-contrast;"
                 />
                 {/* Must stay the image's immediate next sibling: the badge is
-                    revealed by `.spec-frame.is-visible + .spec-cta`, which lets
-                    it follow the existing frame cycling with no JS changes. */}
+                    shown by `.spec-frame.is-visible + .spec-cta`, which ties it
+                    to the frame cycling without touching the slideshow script. */}
                 {m.href && (
                   <a class="spec-cta" href={m.href} target="_blank" rel="noopener noreferrer">
                     {m.label}
@@ -412,49 +432,43 @@ const asMedia = (m) =>
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease;
   }
 
-  /* Live-product link, shown only while its own frame is the visible one.
-     Bottom-left keeps it clear of the dots (bottom centre) and the nav arrows
-     (mid left/right). */
+  /* Live-site link, sitting on the frame it belongs to and visible the whole
+     time that frame is up - it was hover-only, which combined with the ~1s
+     frame cycle made it effectively impossible to find.
+
+     Bottom-right: the dots own bottom-centre, the arrows own the mid sides,
+     and these screenshots put their own titles in the lower left. */
   .spec-cta {
     position: absolute;
-    left: 14px;
+    right: 14px;
     bottom: 12px;
     z-index: 4;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.5rem 0.9rem;
+    padding: 0.48rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(6, 8, 18, 0.72);
+    backdrop-filter: blur(10px);
     color: #fff;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 600;
     text-decoration: none;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(6px);
-    transition: opacity 0.35s ease, transform 0.35s ease, background 0.2s ease,
-      border-color 0.2s ease;
+    transition: opacity 0.35s ease, background 0.2s ease, border-color 0.2s ease,
+      transform 0.2s ease;
   }
-  .spec-cta svg { width: 13px; height: 13px; }
-  /* Hover-revealed, like .spec-nav. The screenshots are marketing art with
-     their own titles baked into the lower-left, so a permanently visible badge
-     sits on top of the artwork's own headline. Hovering is also what pauses the
-     slideshow, so the badge appears exactly when it is clickable. */
-  .spec-media:hover .spec-frame.is-visible + .spec-cta {
+  .spec-cta svg { width: 12px; height: 12px; opacity: 0.8; }
+  .spec-frame.is-visible + .spec-cta {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0);
   }
-  /* touch devices never hover, so there the badge is simply always shown */
-  @media (hover: none) {
-    .spec-frame.is-visible + .spec-cta {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
+  .spec-cta:hover {
+    background: linear-gradient(135deg, #725eff, #4e73ff);
+    border-color: transparent;
+    transform: translateY(-1px);
   }
   .spec-cta:hover {
     background: linear-gradient(135deg, #725eff, #4e73ff);
