@@ -52,8 +52,10 @@ import { site } from "../data/site";
       </div>
     </div>
 
+    <!-- weekdays only: the weekend columns were always dead cells, so they are
+         not rendered at all rather than rendered and disabled -->
     <div class="bk-dow" aria-hidden="true">
-      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
     </div>
 
     <div class="bk-grid" data-bk-grid role="grid" aria-label="Available dates"></div>
@@ -87,11 +89,13 @@ import { site } from "../data/site";
     border-right: 1px solid var(--color-edge);
     background: rgba(255, 255, 255, 0.015);
   }
-  /* 100px to match the nav mark. The source SVG carries a lot of internal
-     padding, so like the nav (-my-9) the negative margins claw back the empty
-     box around the artwork - without them the logo pushes the kicker down and
-     the pane looks top-heavy. Scaled from the old 62px values. */
-  .bk-logo { height: 100px; width: auto; margin: -23px 0 -12px -10px; }
+  /* 100px to match the nav mark. Measured against the rendered pixels: the
+     artwork is flush to the left edge of its box, but vertically it is a 22px
+     band with ~38px of empty box above and ~40px below. So the top and bottom
+     negatives trim real dead space, while the left margin has to stay 0 -
+     anything negative there just pulls the mark out of the text column and it
+     stops lining up with the kicker below it. */
+  .bk-logo { height: 100px; width: auto; margin: -23px 0 -12px 0; }
   .bk-kicker {
     margin-top: 0.2rem;
     font-family: var(--font-mono, monospace);
@@ -162,7 +166,7 @@ import { site } from "../data/site";
      fill the space. */
   .bk-dow, .bk-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
   }
   .bk-dow span {
@@ -179,7 +183,9 @@ import { site } from "../data/site";
      Astro's scoped data-astro-cid attribute and unscoped selectors would not
      match them. Nesting under .bk keeps them from leaking out of here. */
   .bk :global(.bk-day) {
-    min-height: 3.4rem;
+    /* five columns instead of seven made each cell much wider, so the cells
+       grow taller too or they read as letterbox slots rather than dates */
+    min-height: 4.2rem;
     display: grid;
     place-items: center;
     border-radius: 12px;
@@ -352,32 +358,23 @@ import { site } from "../data/site";
     const dayKey = (d: Date) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-    const hash = (s: string) => {
-      let h = 2166136261;
-      for (let i = 0; i < s.length; i += 1) {
-        h ^= s.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-      return Math.abs(h);
-    };
-
     // ── MOCK AVAILABILITY - replace these two with a real free-busy call ──
-    // Slot labels are Eastern Time wall-clock (9:00am-4:30pm ET), which is what
-    // the info pane advertises. They are not converted to the visitor's zone,
-    // so if this ever renders in local time the pane's label must change too.
-    const isOpen = (d: Date) => {
-      if (d < today) return false;
-      const dow = d.getDay();
-      if (dow === 0 || dow === 6) return false;
-      return hash(dayKey(d)) % 11 !== 0;
-    };
+    // Every business day is fully open on 9:00am-6:00pm Eastern, which is what
+    // the info pane advertises. The labels are ET wall-clock and are NOT
+    // converted to the visitor's zone, so if that ever changes the pane's
+    // timezone line has to change with it.
+    const OPEN_MIN = 9 * 60;   // 9:00am ET
+    const CLOSE_MIN = 18 * 60; // 6:00pm ET
+    const STEP = 30;
 
-    const slotsFor = (d: Date) => {
-      const key = dayKey(d);
+    // weekends are never rendered, so this only rejects days already past
+    const isOpen = (d: Date) => d >= today;
+
+    const slotsFor = (_d: Date) => {
       const out: string[] = [];
-      for (let i = 0; i < 16; i += 1) {
-        if (hash(`${key}:${i}`) % 10 < 4) continue;
-        const mins = 9 * 60 + i * 30;
+      // stop a full slot before closing: a 30-minute call starting at 6:00pm
+      // would run past the hours the pane promises, so 5:30pm is the last one
+      for (let mins = OPEN_MIN; mins + STEP <= CLOSE_MIN; mins += STEP) {
         const h24 = Math.floor(mins / 60);
         const m = mins % 60;
         const ampm = h24 >= 12 ? "pm" : "am";
@@ -456,7 +453,11 @@ import { site } from "../data/site";
 
       gridEl.innerHTML = "";
       const first = new Date(view.getFullYear(), view.getMonth(), 1);
-      const lead = (first.getDay() + 6) % 7; // Monday-first; getDay() is Sunday-first
+      // 0=Mon..6=Sun (getDay() is Sunday-first). With weekends dropped the grid
+      // is five wide, so a month opening on Sat or Sun has no lead at all - its
+      // first cell is the Monday that follows.
+      const firstDow = (first.getDay() + 6) % 7;
+      const lead = firstDow > 4 ? 0 : firstDow;
       const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
 
       for (let i = 0; i < lead; i += 1) {
@@ -467,6 +468,7 @@ import { site } from "../data/site";
 
       for (let d = 1; d <= daysInMonth; d += 1) {
         const date = new Date(view.getFullYear(), view.getMonth(), d);
+        if ((date.getDay() + 6) % 7 > 4) continue; // Sat/Sun get no cell
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "bk-day";
