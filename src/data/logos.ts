@@ -46,6 +46,16 @@ export const logoGroups = [
       { slug: "trello", name: "Trello" },
     ],
   },
+  {
+    label: "AI & LLM Platforms",
+    items: [
+      { slug: "anthropic", name: "Anthropic" },
+      { slug: "googlegemini", name: "Google Gemini" },
+      { slug: "huggingface", name: "Hugging Face" },
+      { slug: "langchain", name: "LangChain" },
+      { slug: "mistralai", name: "Mistral AI" },
+    ],
+  },
 ];
 
 // Flat list for the marquee strip.

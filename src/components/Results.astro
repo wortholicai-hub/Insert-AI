@@ -1,16 +1,6 @@
 ---
 import Reviews from "./Reviews.astro";
-
-const stats = [
-  { value: "135+", label: "Workflows automated" },
-  { value: "20+", label: "Industries served" },
-  { value: "60%", label: "Less manual work (selected workflows)" },
-];
-
-const miniOutcomes = [
-  { stat: "24/7", text: "Voice AI handling inbound with zero missed calls." },
-  { stat: "1000s", text: "Documents made instantly searchable via RAG." },
-];
+import MiniCalendar from "./MiniCalendar.astro";
 
 const compare = [
   { who: "Freelancers", build: "build tasks." },
@@ -26,28 +16,12 @@ const compare = [
       <h2 class="display mt-4 text-[clamp(2rem,4vw,3.35rem)]">Proof that goes beyond <span class="accent">pretty demos.</span></h2>
     </div>
 
-    <!-- headline metrics -->
-    <div class="grid gap-4 sm:grid-cols-3">
-      {stats.map((stat) => (
-        <div class="soft-card p-7">
-          <p class="display text-[clamp(2.2rem,4vw,3rem)] text-white">{stat.value}</p>
-          <p class="mt-2 text-sm leading-5 text-white/55">{stat.label}</p>
-        </div>
-      ))}
-    </div>
-
-    <!-- quote + mini case outcomes -->
-    <div class="mt-4 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+    <!-- quote + booking calendar -->
+    <!-- fixed 340px calendar column: on a fluid 1fr it stretched to ~590px and
+         the day cells ballooned to 80px, which is the opposite of compact -->
+    <div class="grid gap-4 lg:grid-cols-[1fr_340px]">
       <Reviews />
-
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-        {miniOutcomes.map((o) => (
-          <div class="flex items-center gap-5 rounded-2xl p-6" style="background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff); box-shadow: 0 12px 28px rgba(85, 94, 255, 0.35);">
-            <span class="display text-3xl text-white">{o.stat}</span>
-            <p class="text-sm leading-6 text-white/85">{o.text}</p>
-          </div>
-        ))}
-      </div>
+      <MiniCalendar />
     </div>
 
     <!-- why us vs others -->

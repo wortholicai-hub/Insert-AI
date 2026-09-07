@@ -1,0 +1,300 @@
+---
+/**
+ * Compact availability calendar for the homepage.
+ *
+ * Deliberately not the contact page's StepCalendar - that one carries meeting
+ * types, a timezone picker and a full slot column, none of which are "compact".
+ * This shows a month grid and a short list of times, then hands off to the
+ * contact page to actually book, so there is only one place a booking is taken.
+ *
+ * Availability uses the same deterministic rule as StepCalendar, so the two
+ * never disagree about a given day. Like that component, it is a MOCKUP:
+ * swap `slotsFor()` for a Cal.com / Google free-busy call and nothing else
+ * here changes.
+ */
+---
+
+<div class="mc soft-card" data-mini-calendar>
+  <div class="mc-head">
+    <button type="button" class="mc-nav" data-mc-prev aria-label="Previous month">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <p class="mc-month" data-mc-month aria-live="polite">—</p>
+    <button type="button" class="mc-nav" data-mc-next aria-label="Next month">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div class="mc-dow" aria-hidden="true">
+    <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+  </div>
+
+  <div class="mc-grid" data-mc-grid role="grid" aria-label="Available dates"></div>
+
+  <div class="mc-slots" data-mc-slots></div>
+
+  <a href="/contact" class="mc-cta" data-mc-cta>
+    Book a call <span aria-hidden="true">→</span>
+  </a>
+</div>
+
+<style>
+  .mc {
+    padding: 1.1rem 1.15rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .mc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .mc-month {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+  .mc-nav {
+    display: grid;
+    place-items: center;
+    height: 26px;
+    width: 26px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .mc-nav:hover:not(:disabled) { border-color: var(--color-acc); color: #fff; }
+  .mc-nav:disabled { opacity: 0.3; cursor: default; }
+
+  .mc-dow, .mc-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  .mc-dow span {
+    text-align: center;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.36);
+    padding-bottom: 2px;
+  }
+
+  /* :global() on every rule below this point is required, not stylistic.
+     The day cells and slot pills are built with createElement in the script,
+     so they never get Astro's scoped data-astro-cid attribute and the scoped
+     selectors simply do not match them - they rendered entirely unstyled.
+     Scoping them under .mc keeps them from leaking out of the component. */
+  .mc :global(.mc-day) {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-size: 11.5px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    /* Bookable days carry a visible cyan tint. At a flat white/3% wash they
+       were indistinguishable from closed days, so the grid told you nothing. */
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(46, 214, 255, 0.08);
+    border-color: rgba(46, 214, 255, 0.2);
+    cursor: pointer;
+    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  }
+  .mc :global(.mc-day.is-empty) { background: none; border-color: transparent; cursor: default; }
+  .mc :global(.mc-day:disabled) {
+    color: rgba(255, 255, 255, 0.17);
+    background: none;
+    border-color: transparent;
+    cursor: default;
+  }
+  .mc :global(.mc-day:hover:not(:disabled):not(.is-on)) {
+    border-color: rgba(46, 214, 255, 0.5);
+    color: #fff;
+  }
+  .mc :global(.mc-day.is-on) {
+    background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .mc-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 28px;
+  }
+  .mc :global(.mc-slot) {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.24rem 0.6rem;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: border-color 0.16s ease, color 0.16s ease;
+  }
+  .mc :global(.mc-slot:hover) { border-color: var(--color-acc); color: #fff; }
+  .mc :global(.mc-hint) {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .mc-cta {
+    margin-top: 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    background: linear-gradient(135deg, #725eff, #4e73ff 52%, #9b5cff);
+    box-shadow: 0 8px 20px rgba(85, 94, 255, 0.3);
+  }
+</style>
+
+<script>
+  const roots = document.querySelectorAll("[data-mini-calendar]");
+
+  roots.forEach((root) => {
+    const monthEl = root.querySelector("[data-mc-month]");
+    const gridEl = root.querySelector("[data-mc-grid]");
+    const slotsEl = root.querySelector("[data-mc-slots]");
+    const prevBtn = root.querySelector("[data-mc-prev]");
+    const nextBtn = root.querySelector("[data-mc-next]");
+    if (!monthEl || !gridEl || !slotsEl) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dayKey = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    // same rule as the contact page's StepCalendar, so the two agree
+    const hash = (s) => {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i += 1) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return Math.abs(h);
+    };
+
+    const isOpen = (d) => {
+      if (d < today) return false;
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) return false; // weekends closed
+      return hash(dayKey(d)) % 11 !== 0;
+    };
+
+    const slotsFor = (d) => {
+      const key = dayKey(d);
+      const out = [];
+      for (let i = 0; i < 16; i += 1) {
+        if (hash(`${key}:${i}`) % 10 < 4) continue; // taken
+        const mins = 9 * 60 + i * 30;
+        const h24 = Math.floor(mins / 60);
+        const m = mins % 60;
+        const ampm = h24 >= 12 ? "pm" : "am";
+        const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+        out.push(`${h12}:${String(m).padStart(2, "0")}${ampm}`);
+        if (out.length === 4) break;
+      }
+      return out;
+    };
+
+    let view = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selected = null;
+
+    const monthFmt = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
+
+    const renderSlots = () => {
+      slotsEl.innerHTML = "";
+      if (!selected) {
+        const p = document.createElement("p");
+        p.className = "mc-hint";
+        p.textContent = "Pick a date to see open times.";
+        slotsEl.appendChild(p);
+        return;
+      }
+      const times = slotsFor(selected);
+      if (!times.length) {
+        const p = document.createElement("p");
+        p.className = "mc-hint";
+        p.textContent = "No times left that day.";
+        slotsEl.appendChild(p);
+        return;
+      }
+      for (const t of times) {
+        // booking itself lives on the contact page - one place, one flow
+        const a = document.createElement("a");
+        a.className = "mc-slot";
+        a.href = "/contact";
+        a.textContent = t;
+        slotsEl.appendChild(a);
+      }
+    };
+
+    const render = () => {
+      monthEl.textContent = monthFmt.format(view);
+
+      // don't let the user page back before the current month
+      const atStart = view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
+      if (prevBtn) prevBtn.disabled = atStart;
+
+      gridEl.innerHTML = "";
+      const first = new Date(view.getFullYear(), view.getMonth(), 1);
+      // Monday-first: JS getDay() is Sunday-first
+      const lead = (first.getDay() + 6) % 7;
+      const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+
+      for (let i = 0; i < lead; i += 1) {
+        const s = document.createElement("span");
+        s.className = "mc-day is-empty";
+        gridEl.appendChild(s);
+      }
+
+      for (let d = 1; d <= daysInMonth; d += 1) {
+        const date = new Date(view.getFullYear(), view.getMonth(), d);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mc-day";
+        btn.textContent = String(d);
+        const open = isOpen(date);
+        btn.disabled = !open;
+        if (open) {
+          btn.setAttribute("aria-label", date.toDateString());
+          btn.addEventListener("click", () => {
+            selected = date;
+            render();
+          });
+        }
+        if (selected && dayKey(selected) === dayKey(date)) btn.classList.add("is-on");
+        gridEl.appendChild(btn);
+      }
+
+      renderSlots();
+    };
+
+    prevBtn?.addEventListener("click", () => {
+      view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+      render();
+    });
+    nextBtn?.addEventListener("click", () => {
+      view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+      render();
+    });
+
+    render();
+  });
+</script>

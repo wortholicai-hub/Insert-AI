@@ -266,9 +266,12 @@ body::before {
 
 .blur-reveal {
   will-change: filter, opacity, transform;
-  filter: blur(12px);
-  opacity: 0;
-  transform: scale(1.06);
+  /* Softer than the original blur(12px)/scale(1.06)/opacity(0): that read as
+     a heavy wash that hung on well after the element was already in view.
+     Keep these in step with the values in Base.astro's scroll handler. */
+  filter: blur(5px);
+  opacity: 0.15;
+  transform: scale(1.02);
 }
 
 .crystal-scene {

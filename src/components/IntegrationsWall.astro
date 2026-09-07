@@ -11,22 +11,35 @@ const listSlugs = (dir) =>
 const colorSet = listSlugs("public/assets/logos-color");
 const colorFor = (slug) => (colorSet.has(slug) ? `/assets/logos-color/${slug}.svg` : undefined);
 
-// Layout lives in a 900x582 viewBox that shares the hub container's aspect
+// Layout lives in a 900x720 viewBox that shares the hub container's aspect
 // ratio (uniform scale). Cards are placed by %, and each wire is an orthogonal
 // path with rounded bends that docks at the centre of the card's facing border.
 const positions = [
-  { left: 51.0, top: 13.4 }, // 0 top
-  { left: 86.7, top: 36.1 }, // 1 right
-  { left: 13.3, top: 36.1 }, // 2 left
-  { left: 86.7, top: 80.8 }, // 3 bottom-right
-  { left: 13.3, top: 80.8 }, // 4 bottom-left
+  { left: 50.00, top: 9.72 },  // top
+  { left: 77.91, top: 29.86 }, // upper-right
+  { left: 22.09, top: 29.86 }, // upper-left
+  { left: 77.91, top: 70.14 }, // lower-right
+  { left: 22.09, top: 70.14 }, // lower-left
+  { left: 50.00, top: 90.28 }, // bottom
 ];
+
+/* All six cards sit on a circle of radius 290 around the hub at (450,360),
+   spaced every 60 degrees, so every card centre is exactly equidistant from
+   it. The viewBox is 900x720 because the old 582 height capped the radius at
+   ~248 and left the cards crowding the hub.
+
+   Wires are orthogonal L-routes, not straight radial spokes. Spokes docked
+   hub-edge to card-edge and came out 150-201 units, which made the comets
+   short and stubby, and every one left from the same ring. These leave from
+   six distinct points on the pill's top and bottom edges and all land within
+   198-201 units, so the comets read at a consistent length. */
 const wires = [
-  [[450, 255], [450, 180], [459, 180], [459, 130]], // top    (hub top -> card bottom)
-  [[554, 291], [630, 291], [630, 210], [700, 210]], // right  (hub right -> card left)
-  [[346, 291], [270, 291], [270, 210], [200, 210]], // left   (hub left -> card right)
-  [[475, 327], [475, 470], [700, 470]],             // bottom-right (hub bottom -> card left)
-  [[425, 327], [425, 470], [200, 470]],             // bottom-left  (hub bottom -> card right)
+  [[450, 314], [450, 113]],              // top
+  [[510, 314], [510, 215], [609, 215]],  // upper-right
+  [[390, 314], [390, 215], [291, 215]],  // upper-left
+  [[510, 406], [510, 505], [609, 505]],  // lower-right
+  [[390, 406], [390, 505], [291, 505]],  // lower-left
+  [[450, 406], [450, 607]],              // bottom
 ];
 
 // Build an SVG path of orthogonal segments with rounded corners.
@@ -49,6 +62,9 @@ function roundedPath(pts, r) {
 }
 const paths = wires.map((w) => roundedPath(w, 22));
 
+// Two waves per cycle: the upper three fire, then the lower three.
+const delayFor = (i) => (i < 3 ? 0 : 4.5);
+
 const groupNodes = logoGroups.map((g, i) => ({
   label: g.label,
   icons: g.items.map((it) => colorFor(it.slug)).filter(Boolean).slice(0, 3),
@@ -59,25 +75,38 @@ const groupNodes = logoGroups.map((g, i) => ({
 
 <section id="integrations" class="py-5">
   <div class="site-shell">
-    <div class="mx-auto max-w-2xl text-center">
+    <div class="text-center">
       <p class="mono text-[--color-acc]">Integrations</p>
-      <h2 class="display mt-4 text-[clamp(2rem,4vw,3.2rem)]">Plugs into the tools you <span class="accent">already use.</span></h2>
+      <!-- deliberately not inside a max-w-2xl wrapper: at 3rem this headline
+           needs ~900px and was wrapping to two lines inside 672px. -->
+      <h2 class="display mt-4 text-[clamp(2rem,4vw,3rem)]">Plugs into the tools you <span class="accent">already use.</span></h2>
       <p class="mx-auto mt-4 max-w-xl text-base leading-7 text-[--color-fg-muted]">
         Connect with 200+ popular business tools and platforms - data flows automatically across everything you run.
       </p>
     </div>
 
     <div class="int-hub" aria-hidden="true">
-      <svg class="int-hub-wires" viewBox="0 0 900 582" fill="none">
+      <svg class="int-hub-wires" viewBox="0 0 900 720" fill="none">
         <defs>
-          <linearGradient id="hubwire" x1="0" y1="0" x2="1" y2="1">
+          <!-- userSpaceOnUse, not the default objectBoundingBox: a perfectly
+               vertical path has a zero-width bounding box, which collapses an
+               objectBoundingBox gradient and renders the stroke invisible.
+               That is why the top and bottom wires vanished while the diagonals
+               drew fine. Fixed coordinates over the viewBox avoid it. -->
+          <linearGradient id="hubwire" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="900" y2="720">
             <stop offset="0" stop-color="#1ed6ff" />
             <stop offset="1" stop-color="#7b5cff" />
           </linearGradient>
         </defs>
         <!-- only the moving comet is drawn; the connecting track stays invisible -->
-        <g class="int-hub-flow" stroke="url(#hubwire)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="42 200">
-          {paths.map((d, i) => <path d={d} pathLength="100" style={`animation-delay:${i < 2 ? 0 : 7}s`} />)}
+        <g class="int-hub-flow" stroke="url(#hubwire)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="58 200">
+          {paths.map((d, i) => (
+            <path
+              d={d}
+              pathLength="100"
+              style={`animation-delay:${delayFor(i)}s`}
+            />
+          ))}
         </g>
       </svg>
 
@@ -87,7 +116,7 @@ const groupNodes = logoGroups.map((g, i) => ({
 
       {groupNodes.map((n, i) => (
         <div class="grp-node" style={`left:${n.left}%;top:${n.top}%;animation-delay:${i * 0.4}s`}>
-          <span class="grp-glow" style={`animation-delay:${i < 2 ? 0 : 7}s`}></span>
+          <span class="grp-glow" style={`animation-delay:${i === 5 ? 0 : (i < 2 ? 0 : 7)}s`}></span>
           <div class="grp-icons">
             {n.icons.map((u) => <img src={u} alt="" width="28" height="26" loading="lazy" decoding="async" />)}
             {n.more > 0 && <span class="grp-more">+{n.more}</span>}
@@ -104,7 +133,7 @@ const groupNodes = logoGroups.map((g, i) => ({
     position: relative;
     width: 100%;
     max-width: 780px;
-    aspect-ratio: 900 / 582;
+    aspect-ratio: 900 / 720;
     margin: 3rem auto 0;
   }
   .int-hub-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -112,14 +141,15 @@ const groupNodes = logoGroups.map((g, i) => ({
   /* one comet segment per wire, following the bends smoothly, hub -> card.
      head reaches the card at 54% of the cycle, tail at 77%. */
   .int-hub-flow path {
-    animation: hub-flow 14s linear infinite;
+    animation: hub-flow 9s linear infinite;
   }
   /* comet crosses during the first 45% of the cycle, then parks off-path
      (invisible) so only one wave of comets is travelling at a time. */
   @keyframes hub-flow {
-    0% { stroke-dashoffset: 42; }
-    45%, 100% { stroke-dashoffset: -142; }
+    0% { stroke-dashoffset: 58; }
+    45%, 100% { stroke-dashoffset: -158; }
   }
+
 
   /* central InsertAI pill (fully opaque) */
   .int-hub-core {
@@ -153,7 +183,10 @@ const groupNodes = logoGroups.map((g, i) => ({
     flex-direction: column;
     align-items: center;
     gap: 0.55rem;
-    width: 138px;
+    /* 160, not 138: at 138 the longer labels ("Ops, Data & Automation",
+       "Accounting & Finance") wrapped onto two lines in the real display font,
+       so cards ended up different heights and the ring looked uneven. */
+    width: 160px;
     padding: 0.85rem 0.7rem;
     border-radius: 16px;
     border: 1px solid var(--color-line-strong);
@@ -174,7 +207,7 @@ const groupNodes = logoGroups.map((g, i) => ({
     pointer-events: none;
     background: linear-gradient(135deg, rgba(46, 214, 255, 0.32), rgba(110, 92, 255, 0.32));
     opacity: 0;
-    animation: grp-ripple 14s linear infinite;
+    animation: grp-ripple 9s linear infinite;
   }
   @keyframes grp-ripple {
     0%, 22% { opacity: 0; }
@@ -203,7 +236,7 @@ const groupNodes = logoGroups.map((g, i) => ({
 
   @media (max-width: 640px) {
     .int-hub { max-width: 420px; }
-    .grp-node { width: 108px; padding: 0.6rem 0.5rem; gap: 0.4rem; border-radius: 13px; }
+    .grp-node { width: 124px; padding: 0.6rem 0.5rem; gap: 0.4rem; border-radius: 13px; }
     .grp-icons { gap: 0.4rem; }
     .grp-icons img { height: 20px; max-width: 22px; }
     .grp-more { font-size: 10px; }
