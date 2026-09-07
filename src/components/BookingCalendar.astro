@@ -246,12 +246,27 @@ import { site } from "../data/site";
        whole card past the calendar next to it */
     max-height: 22rem;
     overflow-y: auto;
+    /* Firefox + Chrome 121+. The track is transparent rather than tinted so
+       only the thumb is ever visible against the panel. */
     scrollbar-width: thin;
+    scrollbar-color: #7d5cff transparent;
     /* fade the bottom edge: without it the slot sitting on the max-height
        boundary looks like a clipped, broken pill rather than a hint that the
        column scrolls */
     mask-image: linear-gradient(to bottom, #000 calc(100% - 1.6rem), transparent);
   }
+  /* older WebKit ignores scrollbar-color, so the grey default would survive
+     there without these */
+  .bk-slots::-webkit-scrollbar { width: 5px; }
+  .bk-slots::-webkit-scrollbar-track { background: transparent; }
+  .bk-slots::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: linear-gradient(180deg, #725eff, #9b5cff);
+  }
+  .bk-slots::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #8a76ff, #b177ff);
+  }
+
   .bk :global(.bk-slot) {
     padding: 0.55rem 0.5rem;
     border-radius: 9px;
