@@ -68,11 +68,31 @@ body::before {
   color: white;
 }
 
-::-webkit-scrollbar { width: 9px; }
+/* Page scrollbar: the booking widget's thin purple thumb, on a black track.
+
+   The track is --color-ink and not transparent. On the root scrollbar there
+   is no element behind the channel to show through - transparent falls back
+   to the browser canvas, which is white, so the bar read as a white stripe
+   down a black page. In-panel scrollbars are the opposite case and do want
+   transparent, since what shows through there is the panel itself.
+
+   These selectors are unscoped and apply to every scrolling element on the
+   site; anything wanting its own treatment has to outrank them, which is what
+   .bk-slots and .legal-body do. */
+html {
+  /* Firefox, and Chrome 121+ which supports the standard properties */
+  scrollbar-width: thin;
+  scrollbar-color: #7d5cff var(--color-ink);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--color-ink); }
 ::-webkit-scrollbar-thumb {
-  background: rgba(103, 92, 255, 0.52);
   border-radius: 999px;
+  background: linear-gradient(180deg, #725eff, #9b5cff);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8a76ff, #b177ff);
 }
 
 .site-shell {

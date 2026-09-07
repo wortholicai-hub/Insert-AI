@@ -24,118 +24,135 @@ const reviews = [
 ];
 
 const initials = (name) => name.split(" ").map((p) => p[0]).slice(0, 2).join("");
+
+// The list is rendered twice. The animation travels exactly one list-width and
+// then repeats, so the second copy is what occupies the right-hand side at the
+// moment the transform snaps back - that is what makes the loop seamless
+// rather than visibly jumping. The copy is aria-hidden so screen readers and
+// search engines see each quote once.
+const marquee = [...reviews, ...reviews];
 ---
 
 <section id="reviews" class="py-5">
   <div class="site-shell">
-    <p class="mono mb-4 text-center text-[--color-acc]">What clients say</p>
+    <div class="mx-auto max-w-2xl pb-9 text-center">
+      <p class="mono text-[--color-acc]">Reviews</p>
+      <h2 class="display mt-4 text-[clamp(2rem,4vw,3.35rem)]">
+        What clients <span class="accent">say.</span>
+      </h2>
+    </div>
 
-    <div class="reviews glass mx-auto flex max-w-3xl flex-col rounded-2xl p-6" data-reviews>
-      <div class="reviews-viewport">
-        <div class="reviews-track" data-track>
-          {reviews.map((r) => (
-            <figure class="reviews-slide">
-              <blockquote class="text-[0.95rem] leading-6 text-white">{r.quote}</blockquote>
-              <figcaption class="mt-auto flex items-center justify-between gap-4 pt-5">
-                <div class="flex items-center gap-3">
-                  {r.avatar ? (
-                    <img src={r.avatar} alt="" width="36" height="36" loading="lazy" decoding="async" class="h-9 w-9 rounded-full object-cover" />
-                  ) : (
-                    <span class="grid h-9 w-9 place-items-center rounded-full text-xs font-bold text-white" style="background:linear-gradient(135deg,#725eff,#4e73ff 55%,#1ed6ff)">{initials(r.name)}</span>
-                  )}
-                  <div>
-                    <p class="text-[0.8rem] font-semibold text-white">{r.name}</p>
-                    <p class="text-[0.72rem] text-white/55">{r.role}</p>
-                  </div>
-                </div>
-                <p class="text-xs tracking-[0.2em]" style="color:#ffc24a">★★★★★</p>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-
-      <!-- controls -->
-      <div class="mt-4 flex items-center justify-between border-t border-white/8 pt-4">
-        <div class="flex gap-2" role="tablist" aria-label="Select review">
-          {reviews.map((_, i) => (
-            <button type="button" class="reviews-dot" data-dot data-active={i === 0 ? "true" : "false"} aria-label={`Review ${i + 1}`}></button>
-          ))}
-        </div>
-        <div class="flex gap-2">
-          <button type="button" class="reviews-arrow" data-prev aria-label="Previous review">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
-          </button>
-          <button type="button" class="reviews-arrow" data-next aria-label="Next review">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
+    <div class="rv-marquee mx-auto max-w-[86rem]">
+      <div class="rv-track">
+        {marquee.map((r, i) => (
+          <figure class="rv-card" aria-hidden={i >= reviews.length ? "true" : undefined}>
+            <p class="rv-stars" aria-label="Rated 5 out of 5">★★★★★</p>
+            <blockquote class="rv-quote">{r.quote}</blockquote>
+            <figcaption class="rv-by">
+              {r.avatar ? (
+                <img src={r.avatar} alt="" width="38" height="38" loading="lazy" decoding="async" class="rv-face" />
+              ) : (
+                <span class="rv-face rv-initials">{initials(r.name)}</span>
+              )}
+              <div>
+                <p class="rv-name">{r.name}</p>
+                <p class="rv-role">{r.role}</p>
+              </div>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* grid/flex items default to min-width:auto and refuse to shrink below their
-     content (the stacked slides) - force them to shrink to the column width. */
-  .reviews { min-width: 0; }
-  .reviews-viewport { overflow: hidden; flex: 1; width: 100%; min-width: 0; }
-  .reviews-track { display: flex; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-  /* 118px, down from 230px: the quotes are two or three lines, so the old
-     floor left a block of dead space under every one of them. Still a fixed
-     floor rather than auto - the track must not resize as slides change. */
-  .reviews-slide { flex: 0 0 100%; width: 100%; min-width: 0; display: flex; flex-direction: column; min-height: 118px; }
-
-  .reviews-dot {
-    width: 18px; height: 3px; border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16); border: 0; cursor: pointer; padding: 0;
-    transition: background 0.3s ease, width 0.3s ease;
+  .rv-marquee {
+    overflow: hidden;
+    /* without the fade, cards are guillotined at the container edge, which
+       reads as a clipping bug rather than as motion continuing off-screen */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
-  .reviews-dot[data-active="true"] { width: 28px; background: linear-gradient(90deg, var(--color-acc), var(--color-acc-2)); }
 
-  .reviews-arrow {
-    display: grid; place-items: center; width: 32px; height: 32px; border-radius: 999px;
-    border: 1px solid var(--color-line-strong); background: rgba(255, 255, 255, 0.03);
-    color: var(--color-fg); cursor: pointer;
-    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  .rv-track {
+    display: flex;
+    gap: 1.3rem;
+    width: max-content;
+    animation: rv-scroll 52s linear infinite;
   }
-  .reviews-arrow:hover { border-color: rgba(46, 214, 255, 0.6); background: rgba(46, 214, 255, 0.08); transform: translateY(-1px); }
+  /* let someone stop a quote they are halfway through reading */
+  .rv-marquee:hover .rv-track { animation-play-state: paused; }
 
+  /* The track is 10 cards and 9 gaps, so one list-width is not -50% - that
+     would be 5 cards and 4.5 gaps. The extra half-gap is the correction. */
+  @keyframes rv-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-50% - 0.65rem)); }
+  }
+
+  .rv-card {
+    flex: 0 0 22rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1.55rem 1.5rem 1.4rem;
+    border-radius: 16px;
+    border: 1px solid var(--color-line-strong);
+    background: linear-gradient(150deg, rgba(19, 25, 50, 0.78), rgba(8, 11, 24, 0.82));
+    transition: border-color 0.25s ease;
+  }
+  .rv-card:hover { border-color: rgba(46, 214, 255, 0.42); }
+
+  .rv-stars {
+    font-size: 1.05rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    color: #ffc24a;
+  }
+
+  .rv-quote {
+    margin-top: 0.95rem;
+    font-size: 0.95rem;
+    line-height: 1.72;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .rv-by {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    /* pins the byline to the bottom, so it lines up across cards of differing
+       quote length instead of floating mid-card */
+    margin-top: auto;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--color-edge);
+  }
+  .rv-face {
+    flex: none;
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .rv-initials {
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #725eff, #4e73ff 55%, #1ed6ff);
+  }
+  .rv-name { font-size: 0.83rem; font-weight: 600; color: #fff; }
+  .rv-role { margin-top: 0.1rem; font-size: 0.74rem; color: rgba(255, 255, 255, 0.55); }
+
+  @media (max-width: 560px) {
+    .rv-card { flex-basis: 18rem; }
+  }
+
+  /* drifting text is a vestibular trigger - hand the row over as something
+     the visitor scrolls themselves */
   @media (prefers-reduced-motion: reduce) {
-    .reviews-track { transition: none; }
+    .rv-track { animation: none; }
+    .rv-marquee { overflow-x: auto; scrollbar-width: thin; scrollbar-color: #7d5cff transparent; }
   }
 </style>
-
-<script>
-  function initReviews() {
-    document.querySelectorAll("[data-reviews]").forEach((root) => {
-      const el = root as HTMLElement;
-      if (el.dataset.init) return;
-      el.dataset.init = "1";
-      const track = el.querySelector("[data-track]") as HTMLElement;
-      const slides = Array.from(track.children);
-      const dots = Array.from(el.querySelectorAll("[data-dot]"));
-      let i = 0;
-      let timer: number | undefined;
-
-      const go = (n: number) => {
-        i = (n + slides.length) % slides.length;
-        track.style.transform = `translateX(-${i * 100}%)`;
-        dots.forEach((d, k) => d.setAttribute("data-active", String(k === i)));
-      };
-      const start = () => { timer = window.setInterval(() => go(i + 1), 6000); };
-      const restart = () => { window.clearInterval(timer); start(); };
-
-      (el.querySelector("[data-prev]") as HTMLElement).addEventListener("click", () => { go(i - 1); restart(); });
-      (el.querySelector("[data-next]") as HTMLElement).addEventListener("click", () => { go(i + 1); restart(); });
-      dots.forEach((d, k) => d.addEventListener("click", () => { go(k); restart(); }));
-      el.addEventListener("mouseenter", () => window.clearInterval(timer));
-      el.addEventListener("mouseleave", start);
-
-      go(0);
-      start();
-    });
-  }
-  initReviews();
-  document.addEventListener("astro:after-swap", initReviews);
-</script>
