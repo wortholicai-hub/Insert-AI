@@ -1,54 +1,25 @@
 ---
 // Each service has an array of images (4-6 per service).
 // Replace these placeholders with your final images later.
+// Order is deliberate and set by the business, not alphabetical or by asset
+// count: SaaS Platforms leads because it is the only category with a public,
+// linkable product behind it.
 const capabilities = [
-  { title: "Internal Dashboards", desc: "Live metrics and controls for your team.",
-    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>`,
-    media: [
-      "/assets/Our services/Internal Dashboards/1.png",
-      "/assets/Our services/Internal Dashboards/2.png",
-      "/assets/Our services/Internal Dashboards/3.png",
-      "/assets/Our services/Internal Dashboards/4.png",
-      "/assets/Our services/Internal Dashboards/5.png",
-      "/assets/Our services/Internal Dashboards/6.png",
-      "/assets/Our services/Internal Dashboards/7.png",
-    ] },
   { title: "SaaS Platforms", desc: "Multi-tenant products, built to scale.",
     icon: `<path d="M12 3 3 7.5l9 4.5 9-4.5L12 3z"/><path d="M3 12l9 4.5L21 12"/><path d="M3 16.5 12 21l9-4.5"/>`,
     media: [
       "/assets/Our services/SaaS Platforms/1.png",
       "/assets/Our services/SaaS Platforms/2.png",
       "/assets/Our services/SaaS Platforms/3.png",
-      "/assets/Our services/SaaS Platforms/4.png",
+      // shipped and public, so this frame carries a link out to it
+      {
+        src: "/assets/Our services/SaaS Platforms/4.png",
+        href: "https://scalenexus.ai/",
+        label: "Visit ScaleNexus.AI",
+        alt: "ScaleNexus.AI - AI-powered dental front desk: call dashboard, callback queue and appointment booking",
+      },
       "/assets/Our services/SaaS Platforms/5.png",
       "/assets/Our services/SaaS Platforms/6.png",
-    ] },
-  { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
-    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
-    media: [
-      "/assets/Our services/Custom Web Apps/1.png",
-      "/assets/Our services/Custom Web Apps/2.png",
-      "/assets/Our services/Custom Web Apps/3.png",
-      "/assets/Our services/Custom Web Apps/4.png",
-      "/assets/Our services/Custom Web Apps/5.png",
-      "/assets/Our services/Custom Web Apps/6.png",
-      "/assets/Our services/Custom Web Apps/7.png",
-      "/assets/Our services/Custom Web Apps/8.png",
-      "/assets/Our services/Custom Web Apps/9.png",
-      "/assets/Our services/Custom Web Apps/10.png",
-      "/assets/Our services/Custom Web Apps/11.png",
-      "/assets/Our services/Custom Web Apps/12.png",
-      "/assets/Our services/Custom Web Apps/13.png",
-    ] },
-  { title: "Workflow Integrations", desc: "Connect 200+ tools into one flow.",
-    icon: `<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2V11a3 3 0 0 0 3 3h1.2M18 8.2V11a3 3 0 0 1-3 3h-1.2"/>`,
-    media: [
-      "/assets/Our services/WORKFLOW/1.png",
-      "/assets/Our services/WORKFLOW/2.png",
-      "/assets/Our services/WORKFLOW/3.png",
-      "/assets/Our services/WORKFLOW/4.png",
-      "/assets/Our services/WORKFLOW/5.png",
-      "/assets/Our services/WORKFLOW/6.png",
     ] },
   { title: "AI Voice Agents", desc: "Inbound & outbound calls, wired to your CRM.",
     icon: `<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>`,
@@ -70,6 +41,17 @@ const capabilities = [
       "/assets/Our services/AI Chat Agents/5.png",
       "/assets/Our services/AI Chat Agents/6.png",
     ] },
+  { title: "Internal Dashboards", desc: "Live metrics and controls for your team.",
+    icon: `<rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M7 16v-4M12 16V8M17 16v-6"/>`,
+    media: [
+      "/assets/Our services/Internal Dashboards/1.png",
+      "/assets/Our services/Internal Dashboards/2.png",
+      "/assets/Our services/Internal Dashboards/3.png",
+      "/assets/Our services/Internal Dashboards/4.png",
+      "/assets/Our services/Internal Dashboards/5.png",
+      "/assets/Our services/Internal Dashboards/6.png",
+      "/assets/Our services/Internal Dashboards/7.png",
+    ] },
   { title: "CRM Automations", desc: "Scoring, routing and follow-ups on autopilot.",
     icon: `<path d="M4.5 12a7.5 7.5 0 0 1 12.5-5.6L20 9"/><path d="M20 4v5h-5"/><path d="M19.5 12a7.5 7.5 0 0 1-12.5 5.6L4 15"/><path d="M4 20v-5h5"/>`,
     media: [
@@ -89,7 +71,40 @@ const capabilities = [
       "/assets/Our services/RAG/4.png",
       "/assets/Our services/RAG/5.png",
     ] },
+  { title: "Workflow Integrations", desc: "Connect 200+ tools into one flow.",
+    icon: `<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M6 8.2V11a3 3 0 0 0 3 3h1.2M18 8.2V11a3 3 0 0 1-3 3h-1.2"/>`,
+    media: [
+      "/assets/Our services/WORKFLOW/1.png",
+      "/assets/Our services/WORKFLOW/2.png",
+      "/assets/Our services/WORKFLOW/3.png",
+      "/assets/Our services/WORKFLOW/4.png",
+      "/assets/Our services/WORKFLOW/5.png",
+      "/assets/Our services/WORKFLOW/6.png",
+    ] },
+  { title: "Custom Web Apps", desc: "Bespoke portals built around your logic.",
+    icon: `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 8.5h18"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/>`,
+    media: [
+      "/assets/Our services/Custom Web Apps/1.png",
+      "/assets/Our services/Custom Web Apps/2.png",
+      "/assets/Our services/Custom Web Apps/3.png",
+      "/assets/Our services/Custom Web Apps/4.png",
+      "/assets/Our services/Custom Web Apps/5.png",
+      "/assets/Our services/Custom Web Apps/6.png",
+      "/assets/Our services/Custom Web Apps/7.png",
+      "/assets/Our services/Custom Web Apps/8.png",
+      "/assets/Our services/Custom Web Apps/9.png",
+      "/assets/Our services/Custom Web Apps/10.png",
+      "/assets/Our services/Custom Web Apps/11.png",
+      "/assets/Our services/Custom Web Apps/12.png",
+      "/assets/Our services/Custom Web Apps/13.png",
+    ] },
 ];
+
+// Most media entries are just a path. An entry that points at something we have
+// actually shipped is an object instead, carrying the outbound link and its own
+// alt text. Normalising here keeps the markup below indifferent to which it is.
+const asMedia = (m) =>
+  typeof m === "string" ? { src: m, href: null, label: null, alt: null } : m;
 ---
 
 <!-- ============ "The Systems We Engineer" interactive capabilities ============ -->
@@ -137,20 +152,31 @@ const capabilities = [
             class:list={["spec-group", { "is-active": gi === 0 }]}
             data-group={gi}
           >
-            {c.media.map((src, si) => (
-              <img
-                src={src}
-                alt={`${c.title} - ${c.desc} Screenshot ${si + 1}`}
-                width="1200"
-                height="800"
-                draggable="false"
-                loading={gi === 0 && si === 0 ? "eager" : "lazy"}
-                decoding="async"
-                fetchpriority={gi === 0 && si === 0 ? "high" : "auto"}
-                class:list={["spec-frame", { "is-visible": si === 0 }]}
-                data-frame={si}
-                style="image-rendering: -webkit-optimize-contrast;"
-              />
+            {c.media.map(asMedia).map((m, si) => (
+              <>
+                <img
+                  src={m.src}
+                  alt={m.alt || `${c.title} - ${c.desc} Screenshot ${si + 1}`}
+                  width="1200"
+                  height="800"
+                  draggable="false"
+                  loading={gi === 0 && si === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchpriority={gi === 0 && si === 0 ? "high" : "auto"}
+                  class:list={["spec-frame", { "is-visible": si === 0 }]}
+                  data-frame={si}
+                  style="image-rendering: -webkit-optimize-contrast;"
+                />
+                {/* Must stay the image's immediate next sibling: the badge is
+                    revealed by `.spec-frame.is-visible + .spec-cta`, which lets
+                    it follow the existing frame cycling with no JS changes. */}
+                {m.href && (
+                  <a class="spec-cta" href={m.href} target="_blank" rel="noopener noreferrer">
+                    {m.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                  </a>
+                )}
+              </>
             ))}
             <!-- progress dots -->
             <div class="spec-dots">
@@ -368,6 +394,43 @@ const capabilities = [
     opacity: 1;
     transform: translateX(120%);
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease;
+  }
+
+  /* Live-product link, shown only while its own frame is the visible one.
+     Bottom-left keeps it clear of the dots (bottom centre) and the nav arrows
+     (mid left/right). */
+  .spec-cta {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .spec-cta svg { width: 13px; height: 13px; }
+  .spec-frame.is-visible + .spec-cta {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .spec-cta:hover {
+    background: linear-gradient(135deg, #725eff, #4e73ff);
+    border-color: transparent;
   }
 
   /* Navigation arrows */
