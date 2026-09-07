@@ -3,8 +3,15 @@ import { site } from "../data/site";
 const year = 2023;
 ---
 
-<footer class="pb-10 pt-6">
-  <div class="site-shell">
+<footer class="pb-10 pt-6" data-footer>
+  <!-- Watermark: a dull wordmark across the whole footer, with a torch that
+       follows the cursor and brings it up to full strength underneath. -->
+  <div class="ft-mark" aria-hidden="true">
+    <span class="ft-mark-dull"></span>
+    <span class="ft-mark-lit"></span>
+  </div>
+
+  <div class="site-shell relative z-10">
     <div class="grid gap-10 border-t border-white/10 pt-8 md:grid-cols-[1.7fr_1fr_1fr_1fr]">
       <div>
         <a href="#top" class="flex items-center text-white" aria-label={site.name}>
@@ -77,6 +84,56 @@ const year = 2023;
     <div id="legalBody" class="legal-body"></div>
   </div>
 </div>
+
+<style>
+  /* ── hover-revealed wordmark ── */
+  footer { position: relative; overflow: hidden; }
+
+  .ft-mark {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* the torch is driven by pointer events on the footer itself, so the mark
+       must never intercept them */
+    pointer-events: none;
+  }
+  /* Both layers are the same image at the same size, so the lit one lands
+     exactly on top of the dull one and the torch reads as the same letters
+     brightening rather than a second mark sliding in.
+
+     The file is a square whose wordmark sits in a band across the middle, so
+     sizing by width overflows the footer vertically on purpose: the empty top
+     and bottom of the artwork are cropped away by the footer's overflow and
+     only the lettering is left. */
+  .ft-mark span {
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/agency-logo/insert ai logo svg black bk.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 105% auto;
+  }
+  .ft-mark-dull { opacity: 0.05; }
+
+  .ft-mark-lit {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    /* a soft-edged hole punched at the cursor - a hard circle would look like a
+       magnifying glass being dragged around */
+    -webkit-mask-image: radial-gradient(circle 220px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.5) 46%, transparent 72%);
+    mask-image: radial-gradient(circle 220px at var(--fx, 50%) var(--fy, 50%), #000 0%, rgba(0, 0, 0, 0.5) 46%, transparent 72%);
+  }
+  footer.is-lit .ft-mark-lit { opacity: 0.34; }
+
+  /* Touch has no cursor to follow, so the torch would either never fire or
+     stick wherever the last tap landed. The dull mark still shows. */
+  @media (hover: none) {
+    .ft-mark-lit { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ft-mark-lit { transition: none; }
+  }
+</style>
 
 <style is:global>
   .legal-overlay {
@@ -639,4 +696,40 @@ const year = 2023;
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 })();
+</script>
+
+<script>
+  // Torch for the footer wordmark: feed the cursor position to the mask as CSS
+  // variables. Coordinates are relative to the footer box, which is what the
+  // radial-gradient's position resolves against.
+  (function () {
+    const foot = document.querySelector('[data-footer]') as HTMLElement | null;
+    if (!foot) return;
+    // pointer-driven only - on touch there is nothing to follow
+    if (!window.matchMedia('(hover: hover)').matches) return;
+
+    let queued = false;
+    let x = 0;
+    let y = 0;
+
+    // the mask repaints on every var change, so coalesce moves onto a frame
+    const apply = () => {
+      queued = false;
+      foot.style.setProperty('--fx', x + 'px');
+      foot.style.setProperty('--fy', y + 'px');
+    };
+
+    foot.addEventListener('pointermove', (e) => {
+      const r = foot.getBoundingClientRect();
+      x = e.clientX - r.left;
+      y = e.clientY - r.top;
+      if (!foot.classList.contains('is-lit')) foot.classList.add('is-lit');
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(apply);
+      }
+    }, { passive: true });
+
+    foot.addEventListener('pointerleave', () => foot.classList.remove('is-lit'));
+  })();
 </script>
