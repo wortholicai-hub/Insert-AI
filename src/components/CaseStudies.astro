@@ -188,8 +188,40 @@ const asMedia = (m) =>
             class:list={["spec-group", { "is-active": gi === 0 }]}
             data-group={gi}
           >
-            {c.media.map(asMedia).map((m, si) => (
-              <>
+            {/*
+              A frame with a live site is an <a> that carries .spec-frame and
+              wraps the image, so the whole screenshot is the click target. The
+              slideshow selects on `.spec-frame`, so each media item still has to
+              produce exactly one such element for the indices to line up - hence
+              the branch rather than an anchor wrapped around every frame.
+            */}
+            {c.media.map(asMedia).map((m, si) =>
+              m.href ? (
+                <a
+                  class:list={["spec-frame", "is-link", { "is-visible": si === 0 }]}
+                  data-frame={si}
+                  href={m.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${m.label} - opens in a new tab`}
+                >
+                  <img
+                    src={m.src}
+                    alt={m.alt || `${c.title} - ${c.desc} Screenshot ${si + 1}`}
+                    width="1200"
+                    height="800"
+                    draggable="false"
+                    loading={gi === 0 && si === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchpriority={gi === 0 && si === 0 ? "high" : "auto"}
+                    style="image-rendering: -webkit-optimize-contrast;"
+                  />
+                  <span class="spec-cta">
+                    {m.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                  </span>
+                </a>
+              ) : (
                 <img
                   src={m.src}
                   alt={m.alt || `${c.title} - ${c.desc} Screenshot ${si + 1}`}
@@ -203,17 +235,8 @@ const asMedia = (m) =>
                   data-frame={si}
                   style="image-rendering: -webkit-optimize-contrast;"
                 />
-                {/* Must stay the image's immediate next sibling: the badge is
-                    shown by `.spec-frame.is-visible + .spec-cta`, which ties it
-                    to the frame cycling without touching the slideshow script. */}
-                {m.href && (
-                  <a class="spec-cta" href={m.href} target="_blank" rel="noopener noreferrer">
-                    {m.label}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-                  </a>
-                )}
-              </>
-            ))}
+              )
+            )}
             <!-- progress dots -->
             <div class="spec-dots">
               {c.media.map((_, si) => (
@@ -385,6 +408,11 @@ const asMedia = (m) =>
     height: 100%;
     object-fit: cover;
     object-position: center;
+    /* Every frame in a group is stacked at inset:0, so the hidden ones sit on
+       top of the visible one. Without this a click would land on whichever
+       transparent frame happens to be last in the DOM and open the wrong
+       site. Only the visible frame is clickable. */
+    pointer-events: none;
     opacity: 0;
     transform: scale(1.08) translateX(30px);
     filter: blur(6px) brightness(0.7);
@@ -398,7 +426,20 @@ const asMedia = (m) =>
     opacity: 1;
     transform: scale(1) translateX(0);
     filter: blur(0) brightness(1);
+    pointer-events: auto;
+    z-index: 1;
   }
+
+  /* a linked frame is an <a>, so the image inside has to do the filling that
+     object-fit was doing for a bare <img> */
+  .spec-frame > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .spec-frame.is-link { cursor: pointer; }
 
   .spec-frame.is-exiting {
     opacity: 0;
@@ -432,9 +473,9 @@ const asMedia = (m) =>
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease;
   }
 
-  /* Live-site link, sitting on the frame it belongs to and visible the whole
-     time that frame is up - it was hover-only, which combined with the ~1s
-     frame cycle made it effectively impossible to find.
+  /* Affordance only - the whole frame is the link, this just says so. It lives
+     inside the anchor, so the frame's own opacity carries it and it needs no
+     show/hide rule of its own.
 
      Bottom-right: the dots own bottom-centre, the arrows own the mid sides,
      and these screenshots put their own titles in the lower left. */
@@ -455,17 +496,12 @@ const asMedia = (m) =>
     font-size: 0.76rem;
     font-weight: 600;
     text-decoration: none;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease, background 0.2s ease, border-color 0.2s ease,
-      transform 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   }
   .spec-cta svg { width: 12px; height: 12px; opacity: 0.8; }
-  .spec-frame.is-visible + .spec-cta {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .spec-cta:hover {
+  /* hovering anywhere on the screenshot lights the pill, since the whole
+     screenshot is what is clickable */
+  .spec-frame.is-link:hover .spec-cta {
     background: linear-gradient(135deg, #725eff, #4e73ff);
     border-color: transparent;
     transform: translateY(-1px);
