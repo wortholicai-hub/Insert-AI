@@ -36,11 +36,6 @@ import { site } from "../data/site";
         <span data-bk-tz>Your local time</span>
       </li>
     </ul>
-
-    <p class="bk-note">
-      No pitch deck. We'll ask what you're trying to build and tell you
-      straight whether it's worth building.
-    </p>
   </aside>
 
   <!-- ── month grid ──────────────────────────────────────── -->
@@ -77,7 +72,7 @@ import { site } from "../data/site";
 <style>
   .bk {
     display: grid;
-    grid-template-columns: 15rem 1fr 12.5rem;
+    grid-template-columns: 16rem minmax(0, 1fr) 13rem;
     gap: 0;
     border-radius: 20px;
     border: 1px solid var(--color-line-strong);
@@ -123,31 +118,19 @@ import { site } from "../data/site";
     color: rgba(255, 255, 255, 0.72);
   }
   .bk-meta svg { flex: none; color: var(--color-acc); }
-  .bk-note {
-    margin-top: 1.3rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid var(--color-edge);
-    font-size: 0.8rem;
-    line-height: 1.65;
-    color: rgba(255, 255, 255, 0.45);
-  }
 
   /* ── calendar pane ── */
-  .bk-cal { padding: 1.7rem 1.6rem; }
+  .bk-cal { padding: 1.9rem 2rem; }
   .bk-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 1.1rem;
-    /* same cap as the grid below, or the month label and arrows sit wider
-       than the dates they belong to */
-    max-width: 25rem;
-    margin-inline: auto;
+    margin-bottom: 1.25rem;
   }
   .bk-month {
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     font-weight: 620;
     letter-spacing: -0.01em;
     color: #fff;
@@ -168,20 +151,20 @@ import { site } from "../data/site";
   .bk-nav:hover:not(:disabled) { border-color: var(--color-acc); color: #fff; }
   .bk-nav:disabled { opacity: 0.28; cursor: default; }
 
-  /* capped and centred: the calendar column is ~530px wide, and at a full-bleed
-     1fr x 7 the square cells came out 75px, which reads as a wall-planner
-     rather than a booking widget */
+  /* full-bleed across the calendar column. The cells are deliberately wider
+     than they are tall - at 1fr x 7 a square cell would be ~100px and read as
+     a wall-planner, which is why this used to be capped at 25rem. Fixing the
+     height instead keeps the widget proportions while letting the calendar
+     fill the space. */
   .bk-dow, .bk-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    max-width: 25rem;
-    margin-inline: auto;
+    gap: 8px;
   }
   .bk-dow span {
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.6rem;
     text-align: center;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.34);
@@ -192,14 +175,14 @@ import { site } from "../data/site";
      Astro's scoped data-astro-cid attribute and unscoped selectors would not
      match them. Nesting under .bk keeps them from leaking out of here. */
   .bk :global(.bk-day) {
-    aspect-ratio: 1;
+    min-height: 3.4rem;
     display: grid;
     place-items: center;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid rgba(46, 214, 255, 0.22);
     background: rgba(46, 214, 255, 0.08);
     color: rgba(255, 255, 255, 0.92);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 550;
     cursor: pointer;
     transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
@@ -223,10 +206,14 @@ import { site } from "../data/site";
   }
   /* the dot is what makes a bookable day readable at a glance on mobile,
      where the tint alone is easy to miss */
+  /* bottom-anchored rather than offset by margin: the cell height is no longer
+     tied to its width, so a fixed offset from the centre would drift */
   .bk :global(.bk-day.is-free)::after {
     content: "";
     position: absolute;
-    margin-top: 1.55rem;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 3px;
     height: 3px;
     border-radius: 50%;
@@ -257,7 +244,7 @@ import { site } from "../data/site";
     margin: 0.9rem 0 1rem;
     /* capped so a busy day scrolls its own column instead of stretching the
        whole card past the calendar next to it */
-    max-height: 15.5rem;
+    max-height: 22rem;
     overflow-y: auto;
     scrollbar-width: thin;
     /* fade the bottom edge: without it the slot sitting on the max-height
@@ -321,7 +308,8 @@ import { site } from "../data/site";
   @media (max-width: 560px) {
     .bk-cal, .bk-info, .bk-times { padding: 1.2rem 1rem; }
     .bk-dow, .bk-grid { gap: 4px; }
-    .bk :global(.bk-day) { font-size: 0.78rem; border-radius: 8px; }
+    .bk :global(.bk-day) { min-height: 2.6rem; font-size: 0.85rem; border-radius: 8px; }
+    .bk :global(.bk-day.is-free)::after { bottom: 5px; }
   }
 </style>
 
